@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { TeachingInput } from "../types";
 
-export default function ConceptForm({ onSubmit }: any) {
+export default function ConceptForm({
+  onSubmit,
+}: {
+  onSubmit: (data: TeachingInput) => void;
+}) {
   const [topic, setTopic] = useState("");
   const [classLevel, setClassLevel] = useState("");
 
@@ -12,7 +17,10 @@ export default function ConceptForm({ onSubmit }: any) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4 w-full max-w-md"
+    >
       <input
         type="text"
         placeholder="Enter topic (e.g., Fractions)"

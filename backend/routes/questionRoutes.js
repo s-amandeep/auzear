@@ -1,16 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { generateQuestions } = require("../services/aiService");
+const { generateQuestions } = require("../controllers/questionController");
 
-router.post("/", async (req, res) => {
-  const { topic, classLevel } = req.body;
-
-  try {
-    const result = await generateQuestions(topic, classLevel);
-    res.json({ data: result });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.post("/", generateQuestions);
 
 module.exports = router;
