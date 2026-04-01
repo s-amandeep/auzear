@@ -15,6 +15,8 @@ export default function Home() {
       >
         Start Teaching
       </button>
+
+      <button onClick={() => router.push("/dashboard")}>View Dashboard</button>
     </main>
   );
 }
