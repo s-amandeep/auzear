@@ -5,7 +5,7 @@ const supabase = require("../config/supabase");
 router.post("/", async (req, res) => {
   const { topic, classLevel, score } = req.body;
 
-  const child_id = "1111-2222"; // temp
+  const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp
   let concept_id;
 
   // 1. Check if concept exists

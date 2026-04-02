@@ -9,7 +9,15 @@ Create 3 conceptual questions:
 - Use real-life examples
 - Keep it very simple
 
- Output as numbered list.
+ Return ONLY JSON in this format:
+
+ {
+  "questions": [
+    "...",
+    "...",
+    "..."
+  ]
+}
 `;
 }
 

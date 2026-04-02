@@ -13,11 +13,14 @@ Instructions:
 - Use real-life analogy
 - Avoid technical terms
 
-Output format:
-1. Explanation
-2. Analogy
-3. Example
-4. Parent Instruction
+Return ONLY JSON in this format:
+
+{
+  "explanation": "...",
+  "analogy": "...",
+  "example": "...",
+  "parent_instruction": "..."
+}
 `;
 }
 

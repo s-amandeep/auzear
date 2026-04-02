@@ -6,9 +6,19 @@ async function generateQuestions(req, res) {
 
   try {
     const prompt = getQuestionPrompt(topic, classLevel);
-    const result = await generateFromPrompt(prompt);
 
-    res.json({ data: result });
+    const raw = await generateFromPrompt(prompt);
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      return res.status(500).json({ error: "Invalid AI response" });
+    }
+
+    res.json({ data: parsed });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
