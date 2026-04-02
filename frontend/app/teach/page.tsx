@@ -1,23 +1,47 @@
 "use client";
 
+import { useState } from "react";
 import ConceptForm from "../components/ConceptForm";
 import TeachingCard from "../components/TeachingCard";
 import { useTeaching } from "../../hooks/useTeaching";
 import { TeachingInput, QuestionResponse } from "../types";
+import { useRouter } from "next/navigation";
 
 export default function TeachPage() {
+  const router = useRouter();
+  const [currentTopic, setCurrentTopic] = useState("");
+  const [currentClass, setCurrentClass] = useState("");
+  const [saving, setSaving] = useState(false);
+
   const { loading, result, questions, startTeaching, submitFeedback } =
     useTeaching();
+
+  const handleStart = ({ topic, classLevel }: TeachingInput) => {
+    setCurrentTopic(topic);
+    setCurrentClass(classLevel);
+    startTeaching({topic, classLevel});
+  };
+
+  const handleFeedbackClick = async (score: number) => {
+    try {
+      let topic = currentTopic;
+      let classLevel = currentClass;
+      setSaving(true);
+      await submitFeedback({topic, classLevel, score});
+      setSaving(false);
+
+      // ✅ Only after successful save
+      router.push("/dashboard");
+    } catch (error) {
+      alert("Failed to save session");
+    }
+  };
 
   return (
     <main className="flex flex-col items-center p-6 gap-6">
       <h1 className="text-2xl font-bold">Teach a Concept</h1>
 
-      <ConceptForm
-        onSubmit={({ topic, classLevel }: TeachingInput) =>
-          startTeaching(topic, classLevel)
-        }
-      />
+      <ConceptForm onSubmit={handleStart} />
 
       {loading && <p>Generating...</p>}
 
@@ -33,13 +57,15 @@ export default function TeachPage() {
           ))}
 
           <div className="flex gap-4 mt-4">
-            <button onClick={() => submitFeedback("", "", 100)}>
-              ✅ Correct
+            <button onClick={() => handleFeedbackClick(90)}>✅ Got it</button>
+
+            <button onClick={() => handleFeedbackClick(60)}>
+              ⚠️ Needs practice
             </button>
-            <button onClick={() => submitFeedback("", "", 60)}>
-              ⚠️ Partial
+
+            <button onClick={() => handleFeedbackClick(30)}>
+              ❌ Didn’t understand
             </button>
-            <button onClick={() => submitFeedback("", "", 30)}>❌ Wrong</button>
           </div>
         </div>
       )}

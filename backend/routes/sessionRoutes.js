@@ -7,6 +7,13 @@ router.post("/", async (req, res) => {
 
   const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp
   let concept_id;
+  let status;
+
+  console.log("Saving session:", { topic, score });
+
+  if (score >= 80) status = "strong";
+  else if (score >= 50) status = "medium";
+  else status = "weak";
 
   // 1. Check if concept exists
   const { data: existing } = await supabase
@@ -41,16 +48,42 @@ router.post("/", async (req, res) => {
   }
 
   // 3. Upsert learning state
-  await supabase.from("learning_states").upsert([
+  const { data, error } = await supabase.from("learning_states").upsert([
     {
       child_id,
       concept_id,
       understanding_score: score,
       last_learned_at: new Date(),
       next_revision_at: next_revision,
-      status: score >= 80 ? "strong" : "weak",
+      status: status,
     },
   ]);
+
+  if (error) {
+    console.error("DB error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  console.log("Saved successfully:", data);
+
+  const { data: sessionData, error: sessionError } = await supabase
+    .from("sessions")
+    .insert([
+      {
+        child_id,
+        concept_id,
+        duration: 0,
+        accuracy: score,
+      },
+    ])
+    .select();
+
+  if (sessionError) {
+    console.error("❌ Session insert failed:", sessionError);
+    return res.status(500).json({ error: sessionError.message });
+  }
+
+  console.log("✅ Session saved:", sessionData);
 
   res.json({ success: true });
 });

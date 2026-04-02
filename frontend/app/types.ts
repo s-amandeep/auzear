@@ -6,3 +6,9 @@ export type TeachingInput = {
 export type QuestionResponse = {
   questions: string[];
 };
+
+export type FeedbackInput = {
+  topic: string;
+  classLevel: string;
+  score: number
+};

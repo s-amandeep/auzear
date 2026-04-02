@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { fetchTeaching, fetchQuestions, saveSession } from "../lib/api";
-import { QuestionResponse } from "../app/types";
+import { TeachingInput, QuestionResponse, FeedbackInput } from "../app/types";
 
 export function useTeaching() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [questions, setQuestions] = useState<QuestionResponse | null>(null);
 
-  const startTeaching = async (topic, classLevel) => {
+  const startTeaching = async ({topic, classLevel} : TeachingInput) => {
     setLoading(true);
 
     const teaching = await fetchTeaching(topic, classLevel);
@@ -19,8 +19,14 @@ export function useTeaching() {
     setLoading(false);
   };
 
-  const submitFeedback = async (topic, classLevel, score) => {
-    await saveSession(topic, classLevel, score);
+  const submitFeedback = async ({topic, classLevel, score} : FeedbackInput) => {
+    try {
+      const result = await saveSession(topic, classLevel, score);
+      return result; // ✅ important
+    } catch (error) {
+      console.error("Error saving session:", error);
+      throw error; // propagate to UI
+    }
   };
 
   return {

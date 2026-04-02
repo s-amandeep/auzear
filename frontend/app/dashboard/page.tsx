@@ -9,9 +9,19 @@ export default function Dashboard() {
 
   const router = useRouter();
 
+  const getColor = (status: string) => {
+    if (status === "strong") return "bg-green-100";
+    if (status === "medium") return "bg-yellow-100";
+    return "bg-red-100";
+  };
+
   useEffect(() => {
     fetchRevision();
   }, []);
+
+  const handleRevise = (item: any) => {
+    router.push(`/revise?concept=${item.conceptName}`);
+  };
 
   const fetchRevision = async () => {
     try {
@@ -53,12 +63,21 @@ export default function Dashboard() {
         revisionList.map((item: any, index) => (
           <div
             key={index}
-            className={`p-4 rounded-xl ${
-              item.status === "weak" ? "bg-red-100" : "bg-green-100"
-            }`}
+            className="p-4 rounded-xl bg-white shadow flex justify-between items-center"
           >
-            <p>{item.concepts?.name}</p>
-            <p>{item.status}</p>
+            <div>
+              <p className="font-semibold">{item.conceptName}</p>
+              {/* <div className={`p-4 rounded-xl ${getColor(item.status)}`}></div>
+              <p className="text-sm text-gray-500">{item.status}</p> */}
+              <p className={`p-4 rounded-xl ${getColor(item.status)}`}></p>
+            </div>
+
+            <button
+              className="bg-black text-white px-3 py-2 rounded-lg"
+              onClick={() => handleRevise(item)}
+            >
+              Revise Now
+            </button>
           </div>
         ))
       )}

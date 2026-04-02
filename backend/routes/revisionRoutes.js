@@ -13,8 +13,8 @@ router.get("/:childId", async (req, res) => {
       .from("learning_states")
       // .select("*, concepts(name)")
       .select("*")
-      .eq("child_id", childId)
-      .lte("next_revision_at", today);
+      .eq("child_id", childId);
+    // .lte("next_revision_at", today);
 
     if (error) {
       console.error("Supabase error:", error);
@@ -53,15 +53,15 @@ router.get("/:childId", async (req, res) => {
 
     // 4. Retention score
     const retentionScore =
-      revision.length > 0
+      states && states.length > 0
         ? Math.round(
-            revision.reduce(
+            states.reduce(
               (acc, item) => acc + (item.understanding_score || 0),
               0,
-            ) / revision.length,
+            ) / states.length,
           )
         : 0;
-
+        
     res.json({
       revision,
       retentionScore,

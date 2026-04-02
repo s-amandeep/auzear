@@ -21,10 +21,18 @@ export async function fetchQuestions(topic, classLevel) {
 }
 
 export async function saveSession(topic, classLevel, score) {
-  await fetch(`${API_URL}/api/session`, {
+  const res = await fetch(`${API_URL}/api/session`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ topic, classLevel, score }),
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to save session");
+  }
+
   alert("Session saved & revision scheduled!");
+  return data;
 }
