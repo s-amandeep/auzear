@@ -1,25 +1,26 @@
-function getTeachingPrompt(topic, classLevel) {
+function getTeachingPrompt(input, classLevel) {
   return `
-You are teaching a Class ${classLevel} student.
+A parent wants to teach a child (Class ${classLevel}).
 
-Topic: ${topic}
+Input: "${input}"
 
-Note:
-- If topic seems like a sentence, extract the main concept.
+Tasks:
+1. Extract topic (1–3 words)
+2. Identify subject (Math, English, Science, EVS, General)
+3. Create a simple teaching script including:
+   - explanation
+   - analogy
+   - real-life example
+   - what parent should say/do
+4. Generate 3 practice questions
 
-Instructions:
-- Use simple language
-- Keep sentences short
-- Use real-life analogy
-- Avoid technical terms
-
-Return ONLY JSON in this format:
+Return ONLY JSON:
 
 {
-  "explanation": "...",
-  "analogy": "...",
-  "example": "...",
-  "parent_instruction": "..."
+  "topic": "...",
+  "subject": "...",
+  "teach": "...",
+  "practice": ["...", "...", "..."]
 }
 `;
 }

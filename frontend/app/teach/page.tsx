@@ -9,25 +9,27 @@ import { useRouter } from "next/navigation";
 
 export default function TeachPage() {
   const router = useRouter();
-  const [currentTopic, setCurrentTopic] = useState("");
-  const [currentClass, setCurrentClass] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const { loading, result, questions, startTeaching, submitFeedback } =
-    useTeaching();
+  const {
+    loading,
+    result,
+    questions,
+    startTeaching,
+    submitFeedback,
+  } = useTeaching();
 
-  const handleStart = ({ topic, classLevel }: TeachingInput) => {
-    setCurrentTopic(topic);
-    setCurrentClass(classLevel);
-    startTeaching({topic, classLevel});
+  const handleStart = async ({ topic, classLevel }: TeachingInput) => {    
+
+    startTeaching({ topic, classLevel });
+
   };
 
   const handleFeedbackClick = async (score: number) => {
     try {
-      let topic = currentTopic;
-      let classLevel = currentClass;
+
       setSaving(true);
-      await submitFeedback({topic, classLevel, score});
+      await submitFeedback({ score });
       setSaving(false);
 
       // ✅ Only after successful save
@@ -45,7 +47,11 @@ export default function TeachPage() {
 
       {loading && <p>Generating...</p>}
 
-      <TeachingCard data={result} />
+      {/* <TeachingCard data={result} /> */}
+      <div className="bg-white p-5 rounded-xl shadow max-w-md">
+        <h2 className="font-semibold mb-2">How to Teach</h2>
+        <p className="text-gray-700">{result}</p>
+      </div>
 
       {questions && (
         <div className="w-full max-w-md bg-white shadow rounded-xl p-6">

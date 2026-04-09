@@ -11,10 +11,8 @@ router.get("/:childId", async (req, res) => {
 
     const { data: states, error } = await supabase
       .from("learning_states")
-      // .select("*, concepts(name)")
       .select("*")
       .eq("child_id", childId);
-    // .lte("next_revision_at", today);
 
     if (error) {
       console.error("Supabase error:", error);
@@ -25,17 +23,6 @@ router.get("/:childId", async (req, res) => {
       return res.json({ revision: [], retentionScore: 0 });
     }
 
-    // const score = !data.length
-    //   ? Math.round(
-    //       data.reduce((acc, item) => acc + item.understanding_score, 0) /
-    //         data.length,
-    //     )
-    //   : 0;
-
-    // res.json({
-    //   revision: data || [],
-    //   retentionScore: score,
-    // });
     // 2. Fetch concept names separately (SAFE way)
     const conceptIds = states.map((s) => s.concept_id);
 
@@ -49,21 +36,44 @@ router.get("/:childId", async (req, res) => {
       ...s,
       conceptName:
         concepts?.find((c) => c.id === s.concept_id)?.name || "Unknown",
+      subject:
+        concepts?.find((c) => c.id === s.concept_id)?.subject || "General",
     }));
+
+    const safeStates = revision || [];
+
+    const resultsToday = safeStates.filter(
+      (item) => item.next_revision_at <= today,
+    );
+
+    const dueToday = [...resultsToday].sort(
+      (a, b) => (a.memory_strength || 0) - (b.memory_strength || 0),
+    );
+
+    const resultsUpcoming = safeStates.filter(
+      (item) => item.next_revision_at > today,
+    );
+
+    const upcoming = [...resultsUpcoming].sort(
+      (a, b) => (a.memory_strength || 0) - (b.memory_strength || 0),
+    );
 
     // 4. Retention score
     const retentionScore =
       states && states.length > 0
         ? Math.round(
-            states.reduce(
-              (acc, item) => acc + (item.understanding_score || 0),
+            (states.reduce(
+              (acc, item) => acc + (item.memory_strength || 0),
               0,
-            ) / states.length,
+            ) /
+              states.length) *
+              100,
           )
         : 0;
-        
+
     res.json({
-      revision,
+      dueToday,
+      upcoming,
       retentionScore,
     });
   } catch (err) {

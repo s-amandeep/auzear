@@ -8,7 +8,8 @@ export type QuestionResponse = {
 };
 
 export type FeedbackInput = {
-  topic: string;
-  classLevel: string;
+  // topic: string;
+  // subject: string;
+  // classLevel: string;
   score: number
 };

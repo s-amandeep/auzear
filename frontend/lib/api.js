@@ -1,3 +1,4 @@
+import { FeedbackInput } from "../app/types";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function fetchTeaching(topic, classLevel) {
@@ -20,11 +21,14 @@ export async function fetchQuestions(topic, classLevel) {
   return res.json();
 }
 
-export async function saveSession(topic, classLevel, score) {
+export async function saveSession(topic,
+    subject,
+    classLevel,
+    score) {
   const res = await fetch(`${API_URL}/api/session`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic, classLevel, score }),
+    body: JSON.stringify({ topic, subject, classLevel, score }),
   });
 
   const data = await res.json();

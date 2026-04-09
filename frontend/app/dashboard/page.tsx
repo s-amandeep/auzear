@@ -6,6 +6,7 @@ import { Brain, AlertCircle } from "lucide-react";
 
 export default function Dashboard() {
   const [revisionList, setRevisionList] = useState<any[]>([]);
+  const [upcoming, setUpcoming] = useState<any[]>([]);
   const [retentionScore, setRetentionScore] = useState<number>(0);
 
   const router = useRouter();
@@ -50,13 +51,15 @@ export default function Dashboard() {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/revision/c3658790-741b-4823-be25-0822ba4e72df`,
+        // `${process.env.NEXT_PUBLIC_API_URL}/api/revision/${childId}`
       );
 
       const text = await res.text();
 
       try {
         const data = JSON.parse(text);
-        setRevisionList(data.revision || []);
+        setRevisionList(data.dueToday || []);
+        setUpcoming(data.upcoming || []);
         setRetentionScore(data.retentionScore || 0);
       } catch {
         console.error("Not JSON:", text);
@@ -65,8 +68,6 @@ export default function Dashboard() {
       console.error(error);
     }
   };
-
-  // Need to add fetchRetentionScore Logic where I set setRetentionScore(data.retentionScore || 0);
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center p-6 gap-6">
@@ -79,23 +80,25 @@ export default function Dashboard() {
         <p className="text-4xl font-bold mt-2">{retentionScore}%</p>
 
         <p className="text-sm text-gray-500 mt-2">
-          {retentionScore > 75
-            ? "Great retention"
-            : retentionScore > 50
-              ? "Needs revision"
-              : "Revise soon"}
+          {retentionScore > 80
+            ? "Excellent retention"
+            : retentionScore > 60
+              ? "Good progress"
+              : retentionScore > 40
+                ? "Needs attention"
+                : "At risk of forgetting"}
         </p>
       </div>
 
       <div className="w-full max-w-md bg-black text-white rounded-2xl p-6">
         <p className="text-lg font-semibold">
           {revisionList.length > 0
-            ? `${revisionList.length} concepts need attention`
-            : "You're all caught up 🎉"}
+            ? `Today ${revisionList.length} concept(s) need attention`
+            : "Great job! You're all caught up. No pending revisions today 🎉"}
         </p>
 
         <div className="flex flex-col gap-3 mt-4">
-          {revisionList.length > 0 ? (
+          {/* {revisionList.length > 0 ? (
             <button
               className="bg-white text-black px-4 py-2 rounded-xl"
               onClick={() => handleRevise(revisionList[0])}
@@ -107,24 +110,88 @@ export default function Dashboard() {
               className="bg-white text-black px-4 py-2 rounded-xl"
               onClick={() => router.push("/teach")}
             >
-              Start Learning
+              Teach Something New
             </button>
-          )}
+          )} */}
 
-          <button
+          {/* <button
             className="border border-white px-4 py-2 rounded-xl"
             onClick={() => router.push("/teach")}
           >
             Teach Something New
-          </button>
+          </button> */}
+          {!revisionList || revisionList.length === 0 ? (
+            <button
+              className="bg-white text-black px-4 py-2 rounded-xl"
+              onClick={() => router.push("/teach")}
+            >
+              Teach Something New
+            </button>
+          ) : (
+            revisionList.map((item: any, index) => {
+              const style = getStyles(item.status);
+
+              return (
+                <div
+                  key={index}
+                  className={`w-full max-w-md p-5 rounded-2xl shadow-sm ${style.bg}`}
+                >
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold text-lg text-black">
+                      {item.conceptName}
+                    </p>
+
+                    {item.memory_strength < 0.4 && (
+                      <span className="text-xs text-red-500">
+                        Needs Immediate Attention
+                      </span>
+                    )}
+
+                    <span className={`text-sm ${style.text}`}>
+                      {style.label}
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <div className="w-full bg-gray-200 h-2 rounded-full">
+                      <div
+                        className="h-2 rounded-full bg-green-500"
+                        style={{
+                          width: `${(item.memory_strength || 0) * 100}%`,
+                        }}
+                      />
+                    </div>
+
+                    <p className="text-xs text-gray-500 mt-1">
+                      Memory Strength:{" "}
+                      {Math.round((item.memory_strength || 0) * 100)}%
+                    </p>
+                  </div>
+
+                  <div className="mt-4 flex justify-between items-center">
+                    <p className="text-sm text-gray-500">
+                      Score: {item.understanding_score}
+                    </p>
+
+                    <button
+                      className="bg-black text-white px-3 py-1 rounded-lg text-sm"
+                      onClick={() => handleRevise(item)}
+                    >
+                      Revise
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 
-      <h2 className="text-2xl font-bold">Today's Revision</h2>
-      {!revisionList || revisionList.length === 0 ? (
-        <p className="text-gray-500">Great job! No pending revisions 🎉</p>
+      <h2 className="text-xl font-semibold">Upcoming</h2>
+
+      {!upcoming || upcoming.length === 0 ? (
+        <p className="text-gray-500">Great job! No upcoming revisions 🎉</p>
       ) : (
-        revisionList.map((item: any, index) => {
+        upcoming.map((item: any, index) => {
           const style = getStyles(item.status);
 
           return (
@@ -134,13 +201,38 @@ export default function Dashboard() {
             >
               <div className="flex justify-between items-center">
                 <p className="font-semibold text-lg">{item.conceptName}</p>
+                {item.memory_strength < 0.4 && (
+                  <span className="text-xs text-red-500">
+                    Needs Immediate Attention
+                  </span>
+                )}
 
                 <span className={`text-sm ${style.text}`}>{style.label}</span>
+              </div>
+              <div className="mt-3">
+                <div className="w-full bg-gray-200 h-2 rounded-full">
+                  <div
+                    className="h-2 rounded-full bg-green-500"
+                    style={{
+                      width: `${(item.memory_strength || 0) * 100}%`,
+                    }}
+                  />
+                </div>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  Memory Strength:{" "}
+                  {Math.round((item.memory_strength || 0) * 100)}%
+                </p>
               </div>
 
               <div className="mt-4 flex justify-between items-center">
                 <p className="text-sm text-gray-500">
                   Score: {item.understanding_score}
+                </p>
+
+                <p className="text-sm text-black-500 mt-1">
+                  Next Revision:{" "}
+                  {new Date(item.next_revision_at).toLocaleDateString("en-GB")}
                 </p>
 
                 <button

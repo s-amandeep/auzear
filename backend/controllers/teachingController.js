@@ -1,25 +1,28 @@
 const { generateFromPrompt } = require("../services/aiService");
 const { getTeachingPrompt } = require("../prompts/teachingPrompt");
-const { cleanTopicWithAI } = require("../utils/cleanTopicWithAI");
 
 async function generateTeaching(req, res) {
   const { topic, classLevel } = req.body;
 
   try {
-    const cleanTopic = await cleanTopicWithAI(topic);
-    console.log("here", topic, "---",cleanTopic);
-    const prompt = getTeachingPrompt(cleanTopic, classLevel);
-    const raw = await generateFromPrompt(prompt);
+    const normalizedTopic = topic.trim().toLowerCase();   
 
     let parsed;
 
     try {
+      const prompt = getTeachingPrompt(normalizedTopic, classLevel);
+      const raw = await generateFromPrompt(prompt);
       parsed = JSON.parse(raw);
     } catch (e) {
       return res.status(500).json({ error: "Invalid AI response" });
     }
 
-    res.json({ data: parsed });
+    res.json({
+    topic: parsed.topic,
+    subject: parsed.subject,
+    teach: parsed.teach,
+    questions: parsed.practice,
+  });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

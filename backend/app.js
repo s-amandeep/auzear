@@ -6,7 +6,6 @@ const cors = require("cors");
 const app = express();
 
 const teachingRoutes = require("./routes/teachingRoutes");
-const questionRoutes = require("./routes/questionRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const revisionRoutes = require("./routes/revisionRoutes");
 
@@ -19,7 +18,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/teaching", teachingRoutes);
-app.use("/api/questions", questionRoutes);
 app.use("/api/session", sessionRoutes);
 app.use("/api/revision", revisionRoutes);
 
