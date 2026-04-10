@@ -13,3 +13,31 @@ export type FeedbackInput = {
   // classLevel: string;
   score: number
 };
+
+export type SubjectStat = {
+  subject: string;
+  avgMemory: number;
+  count: number;
+};
+
+export type WeakestSubject = {
+  subject: string;
+  avgMemory: number;
+  count: number;
+} | null;
+
+export type WeeklyPlanItem = {
+  concept: string;
+  subject: string;
+  date: string;
+};
+
+export type RevisionResponse = {
+  dueToday: any[];
+  upcoming: any[];
+  retentionScore: number;
+  subjectStats: SubjectStat[];
+  weakestSubject: WeakestSubject;
+  suggestion: string;
+  weeklyPlan: WeeklyPlanItem[];
+};

@@ -47,11 +47,11 @@ export default function TeachPage() {
 
       {loading && <p>Generating...</p>}
 
-      {/* <TeachingCard data={result} /> */}
-      <div className="bg-white p-5 rounded-xl shadow max-w-md">
-        <h2 className="font-semibold mb-2">How to Teach</h2>
+      <TeachingCard data={result} />
+      {/* <div className="bg-white p-5 rounded-xl shadow max-w-md">
+        <h2 className="font-semibold mb-2">How to Teach</h2>       
         <p className="text-gray-700">{result}</p>
-      </div>
+      </div> */}
 
       {questions && (
         <div className="w-full max-w-md bg-white shadow rounded-xl p-6">

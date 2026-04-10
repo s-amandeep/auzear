@@ -9,6 +9,8 @@ router.get("/:childId", async (req, res) => {
 
     const today = new Date().toISOString();
 
+    const subjectMap = {};
+
     const { data: states, error } = await supabase
       .from("learning_states")
       .select("*")
@@ -42,6 +44,52 @@ router.get("/:childId", async (req, res) => {
 
     const safeStates = revision || [];
 
+    // Subject-wise logic
+
+    safeStates.forEach((item) => {
+      const subject = item.subject || "General";
+      const memory = item.memory_strength || 0;
+
+      if (!subjectMap[subject]) {
+        subjectMap[subject] = [];
+      }
+
+      subjectMap[subject].push(memory);
+    });
+
+    const subjectStats = Object.keys(subjectMap).map((subject) => {
+      const values = subjectMap[subject];
+
+      const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+      return {
+        subject,
+        avgMemory: avg,
+        count: values.length,
+      };
+    });
+
+    subjectStats.sort((a, b) => a.avgMemory - b.avgMemory);
+
+    const weakestSubject = subjectStats[0] || null;    
+
+    // Subject-wise logic ends here
+
+    // Weekly plan
+
+    const weeklyPlan = safeStates
+      .sort(
+        (a, b) => new Date(a.next_revision_at) - new Date(b.next_revision_at),
+      )
+      .slice(0, 5)
+      .map((item) => ({
+        concept: item.conceptName,
+        subject: item.subject, // 🔥 ADD THIS
+        date: item.next_revision_at,
+      }));
+
+    // Weekly Plan ends here
+
     const resultsToday = safeStates.filter(
       (item) => item.next_revision_at <= today,
     );
@@ -57,6 +105,14 @@ router.get("/:childId", async (req, res) => {
     const upcoming = [...resultsUpcoming].sort(
       (a, b) => (a.memory_strength || 0) - (b.memory_strength || 0),
     );
+
+    let suggestion = "Introduce a new concept today";
+
+    if (dueToday.length > 0) {
+      suggestion = `Revise ${dueToday[0].conceptName} today`;
+    } else if (weakestSubject) {
+      suggestion = `Focus on ${weakestSubject.subject}`;
+    }
 
     // 4. Retention score
     const retentionScore =
@@ -75,7 +131,12 @@ router.get("/:childId", async (req, res) => {
       dueToday,
       upcoming,
       retentionScore,
+      subjectStats, // 🔥 new
+      weakestSubject, // 🔥 new
+      suggestion,
+      weeklyPlan,
     });
+
   } catch (err) {
     console.error("Server error:", err);
     res.status(500).json({ error: "Internal server error" });

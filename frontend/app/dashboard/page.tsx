@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Brain, AlertCircle } from "lucide-react";
+import { SubjectStat, WeakestSubject, WeeklyPlanItem, RevisionResponse } from "../types";
 
 export default function Dashboard() {
+  // const data: RevisionResponse = JSON.parse(text);
   const [revisionList, setRevisionList] = useState<any[]>([]);
   const [upcoming, setUpcoming] = useState<any[]>([]);
   const [retentionScore, setRetentionScore] = useState<number>(0);
+  const [subjectStats, setSubjectStats] = useState<SubjectStat[]>([]);
+  const [weakestSubject, setWeakestSubject] = useState<WeakestSubject>(null);
+  const [suggestion, setSuggestion] = useState<string>("");
+  const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlanItem[]>([]);
 
   const router = useRouter();
-
-  const getColor = (status: string) => {
-    if (status === "strong") return "bg-green-100";
-    if (status === "medium") return "bg-yellow-100";
-    return "bg-red-100";
-  };
 
   const getStyles = (status: string) => {
     if (status === "strong") {
@@ -61,6 +61,11 @@ export default function Dashboard() {
         setRevisionList(data.dueToday || []);
         setUpcoming(data.upcoming || []);
         setRetentionScore(data.retentionScore || 0);
+
+        setSubjectStats(data.subjectStats || []);
+        setWeakestSubject(data.weakestSubject || null);
+        setSuggestion(data.suggestion || "");
+        setWeeklyPlan(data.weeklyPlan || []);
       } catch {
         console.error("Not JSON:", text);
       }
@@ -246,6 +251,56 @@ export default function Dashboard() {
           );
         })
       )}
+
+      <h2 className="text-xl font-semibold">Subject Performance</h2>
+
+      {subjectStats.length === 0 ? (
+        <p>No subject data yet</p>
+      ) : (
+        subjectStats.map((s: any, i: number) => (
+          <div
+            key={i}
+            className="bg-white p-4 rounded-xl shadow w-full max-w-md"
+          >
+            <div className="flex justify-between">
+              <p>{s.subject}</p>
+              <p>{Math.round(s.avgMemory * 100)}%</p>
+            </div>
+
+            <div className="w-full bg-gray-200 h-2 mt-2 rounded-full">
+              <div
+                className="bg-black h-2 rounded-full"
+                style={{ width: `${s.avgMemory * 100}%` }}
+              />
+            </div>
+          </div>
+        ))
+      )}
+
+      {weakestSubject && (
+        <div className="bg-red-50 p-4 rounded-xl w-full max-w-md">
+          <p className="font-semibold">Focus Area: {weakestSubject.subject}</p>
+          <p className="text-sm text-gray-600">Needs attention</p>
+        </div>
+      )}
+
+      <div className="bg-blue-50 p-4 rounded-xl w-full max-w-md">
+        <p className="text-sm text-gray-500">Suggestion</p>
+        <p className="font-semibold">{suggestion}</p>
+      </div>
+
+      {weeklyPlan.map((item: any, i: number) => (
+        <div
+          key={i}
+          className="p-3 bg-white rounded-xl shadow-sm w-full max-w-md"
+        >
+          {/* {item.concept} - {item.subject} */}
+          <p>{item.concept}</p>
+          <p className="text-xs text-gray-500">
+            {item.subject} • {new Date(item.date).toLocaleDateString()}
+          </p>
+        </div>
+      ))}
     </main>
   );
 }
