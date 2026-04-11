@@ -27,13 +27,14 @@ export function useTeaching() {
     return teaching;
   };
 
-  const submitFeedback = async ({ score }: FeedbackInput) => {
+  const submitFeedback = async ({ score, engagement }: FeedbackInput) => {
     try {
       const result = await saveSession({
         topic: currentTopic,
         subject: currentSubject || "General",
         classLevel: currentClass,
         score,
+        engagement,
       });
       return result; // ✅ important
     } catch (error) {

@@ -10,26 +10,34 @@ import { useRouter } from "next/navigation";
 export default function TeachPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [engagement, setEngagement] = useState<
+    "low" | "medium" | "high" | "very_high" | ""
+  >("");
 
-  const {
-    loading,
-    result,
-    questions,
-    startTeaching,
-    submitFeedback,
-  } = useTeaching();
+  const { loading, result, questions, startTeaching, submitFeedback } =
+    useTeaching();
 
-  const handleStart = async ({ topic, classLevel }: TeachingInput) => {    
-
+  const handleStart = async ({ topic, classLevel }: TeachingInput) => {
     startTeaching({ topic, classLevel });
-
   };
+
+  const engagementOptions = [
+    { label: "😕", value: "low" as const, text: "Didn't understand" },
+    { label: "🤔", value: "medium" as const, text: "Partially understood" },
+    { label: "😊", value: "high" as const, text: "Understood well" },
+    { label: "😄", value: "very_high" as const, text: "Enjoyed it" },
+  ];
 
   const handleFeedbackClick = async (score: number) => {
     try {
+      if (!engagement) {
+        alert("Please select how your child responded");
+        return;
+      }
 
       setSaving(true);
-      await submitFeedback({ score });
+
+      await submitFeedback({ score, engagement });
       setSaving(false);
 
       // ✅ Only after successful save
@@ -72,6 +80,25 @@ export default function TeachPage() {
             <button onClick={() => handleFeedbackClick(30)}>
               ❌ Didn’t understand
             </button>
+          </div>
+
+          <div className="mt-4">
+            <p className="text-sm text-gray-500">How did your child respond?</p>
+
+            <div className="flex gap-3 mt-2">
+              {engagementOptions.map((item) => (
+                <button
+                  key={item.value}
+                  className={`flex flex-col items-center px-3 py-2 rounded-lg border ${
+                    engagement === item.value ? "bg-black text-white" : ""
+                  }`}
+                  onClick={() => setEngagement(item.value)}
+                >
+                  <span className="text-xl">{item.label}</span>
+                  <span className="text-xs mt-1">{item.text}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

@@ -13,7 +13,13 @@ router.get("/:childId", async (req, res) => {
 
     const { data: states, error } = await supabase
       .from("learning_states")
-      .select("*")
+      // .select("*")
+      .select(
+        `
+          *,
+          concepts (name, subject)
+        `,
+      )
       .eq("child_id", childId);
 
     if (error) {
@@ -26,20 +32,27 @@ router.get("/:childId", async (req, res) => {
     }
 
     // 2. Fetch concept names separately (SAFE way)
-    const conceptIds = states.map((s) => s.concept_id);
+    // const conceptIds = states.map((s) => s.concept_id);
 
-    const { data: concepts } = await supabase
-      .from("concepts")
-      .select("id, name")
-      .in("id", conceptIds);
+    // const { data: concepts } = await supabase
+    //   .from("concepts")
+    //   .select("id, name, subject")
+    //   .in("id", conceptIds);
 
     // 3. Merge data
+
+    // const conceptMap = {};
+
+    // concepts.forEach((c) => {
+    //   conceptMap[c.id] = c;
+    // });
+
     const revision = states.map((s) => ({
       ...s,
-      conceptName:
-        concepts?.find((c) => c.id === s.concept_id)?.name || "Unknown",
-      subject:
-        concepts?.find((c) => c.id === s.concept_id)?.subject || "General",
+      // conceptName: conceptMap[s.concept_id]?.name || "Unknown",
+      conceptName: s.concepts.name || "Unknown",
+      subject: s.concepts.subject || "General",
+      // subject: conceptMap[s.concept_id]?.subject || "General",
     }));
 
     const safeStates = revision || [];
@@ -71,7 +84,7 @@ router.get("/:childId", async (req, res) => {
 
     subjectStats.sort((a, b) => a.avgMemory - b.avgMemory);
 
-    const weakestSubject = subjectStats[0] || null;    
+    const weakestSubject = subjectStats[0] || null;
 
     // Subject-wise logic ends here
 
@@ -136,7 +149,6 @@ router.get("/:childId", async (req, res) => {
       suggestion,
       weeklyPlan,
     });
-
   } catch (err) {
     console.error("Server error:", err);
     res.status(500).json({ error: "Internal server error" });

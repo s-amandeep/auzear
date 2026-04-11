@@ -11,7 +11,8 @@ export type FeedbackInput = {
   // topic: string;
   // subject: string;
   // classLevel: string;
-  score: number
+  score: number;
+  engagement: "low" | "medium" | "high" | "very_high";
 };
 
 export type SubjectStat = {

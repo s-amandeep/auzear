@@ -21,14 +21,17 @@ export async function fetchQuestions(topic, classLevel) {
   return res.json();
 }
 
-export async function saveSession(topic,
-    subject,
-    classLevel,
-    score) {
+export async function saveSession(
+  topic,
+  subject,
+  classLevel,
+  score,
+  engagement,
+) {
   const res = await fetch(`${API_URL}/api/session`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic, subject, classLevel, score }),
+    body: JSON.stringify({ topic, subject, classLevel, score, engagement }),
   });
 
   const data = await res.json();

@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Brain, AlertCircle } from "lucide-react";
-import { SubjectStat, WeakestSubject, WeeklyPlanItem, RevisionResponse } from "../types";
+import {
+  SubjectStat,
+  WeakestSubject,
+  WeeklyPlanItem,
+  RevisionResponse,
+} from "../types";
 
 export default function Dashboard() {
   // const data: RevisionResponse = JSON.parse(text);
@@ -58,6 +63,7 @@ export default function Dashboard() {
 
       try {
         const data = JSON.parse(text);
+        console.log(data);
         setRevisionList(data.dueToday || []);
         setUpcoming(data.upcoming || []);
         setRetentionScore(data.retentionScore || 0);
@@ -289,6 +295,7 @@ export default function Dashboard() {
         <p className="font-semibold">{suggestion}</p>
       </div>
 
+      <h2 className="text-xl font-semibold">Weekly Plan</h2>
       {weeklyPlan.map((item: any, i: number) => (
         <div
           key={i}

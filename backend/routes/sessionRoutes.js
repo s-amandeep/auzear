@@ -1,14 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const supabase = require("../config/supabase");
-// const { extractTopicAndSubject } = require("../utils/extractTopicAndSubject");
 
 router.post("/", async (req, res) => {
-  const { topic, subject, classLevel, score } = req.body;
+  const { topic } = req.body;
 
   console.log(topic);
   const normalizedTopic = topic.topic.trim().toLowerCase();
   console.log(normalizedTopic);
+  const currentSubject = topic.subject;
+  const currentScore = topic.score;
+  const engagement = topic.engagement;
 
   const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp
   let concept_id;
@@ -28,7 +30,7 @@ router.post("/", async (req, res) => {
   } else {
     const { data: newConcept, error } = await supabase
       .from("concepts")
-      .insert([{ name: normalizedTopic, subject: subject }])
+      .insert([{ name: normalizedTopic, subject: currentSubject }])
       .select()
       .single();
 
@@ -50,8 +52,12 @@ router.post("/", async (req, res) => {
   if (existingState) {
     const prev = existingState.memory_strength || 0;
 
-    if (score >= 80) newMemory = Math.min(prev + 0.2, 1);
-    else if (score >= 50) newMemory = prev + 0.05;
+    // if (score >= 80) newMemory = Math.min(prev + 0.2, 1);
+    // else if (score >= 50) newMemory = prev + 0.05;
+    // else newMemory = Math.max(prev - 0.2, 0);
+
+    if (currentScore >= 80) newMemory = Math.min(prev + 0.2, 1);
+    else if (currentScore >= 50) newMemory = prev + 0.05;
     else newMemory = Math.max(prev - 0.2, 0);
   }
 
@@ -68,7 +74,8 @@ router.post("/", async (req, res) => {
       {
         child_id,
         concept_id,
-        understanding_score: score,
+        // understanding_score: score,
+        understanding_score: currentScore,
         memory_strength: newMemory,
         last_learned_at: new Date(),
         next_revision_at: next_revision,
@@ -95,7 +102,9 @@ router.post("/", async (req, res) => {
         child_id,
         concept_id,
         duration: 0,
-        accuracy: score,
+        // accuracy: score,
+        accuracy: currentScore,
+        engagement,
       },
     ])
     .select();
