@@ -9,17 +9,19 @@ export function useTeaching() {
   const [currentClass, setCurrentClass] = useState("");
   const [result, setResult] = useState("");
   const [questions, setQuestions] = useState<QuestionResponse | null>(null);
+  const [parentTip, setParentTip] = useState(""); 
 
 
-  const startTeaching = async ({ topic, classLevel }: TeachingInput) => {
+  const startTeaching = async ({ topic, classLevel, engagement }: TeachingInput) => {
     setLoading(true);
 
-    const teaching = await fetchTeaching(topic, classLevel);
+    const teaching = await fetchTeaching(topic, classLevel, engagement);
 
     setCurrentTopic(teaching.topic);
     setCurrentSubject(teaching.subject);
     setResult(teaching.teach);
     setQuestions({ questions: teaching.questions });
+    setParentTip(teaching.parentTip || "");
     setCurrentClass(classLevel);
 
     setLoading(false);
@@ -27,13 +29,13 @@ export function useTeaching() {
     return teaching;
   };
 
-  const submitFeedback = async ({ score, engagement }: FeedbackInput) => {
+  const submitFeedback = async ({ engagement }: FeedbackInput) => {
     try {
       const result = await saveSession({
         topic: currentTopic,
         subject: currentSubject || "General",
         classLevel: currentClass,
-        score,
+        // score,
         engagement,
       });
       return result; // ✅ important
@@ -43,6 +45,22 @@ export function useTeaching() {
     }
   };
 
+  // const improveTeaching = async ({ topic, classLevel }: TeachingInput) => {
+  //   setLoading(true);
+
+  //   const teaching = await fetchTeaching(topic, classLevel);
+
+  //   setCurrentTopic(teaching.topic);
+  //   setCurrentSubject(teaching.subject);
+  //   setResult(teaching.teach);
+  //   setQuestions({ questions: teaching.questions });
+  //   setCurrentClass(classLevel);
+
+  //   setLoading(false);
+
+  //   return teaching;
+  // };
+
   return {
     loading,
     currentTopic,
@@ -51,5 +69,6 @@ export function useTeaching() {
     questions,
     startTeaching,
     submitFeedback,
+    parentTip,
   };
 }

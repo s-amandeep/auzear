@@ -1,17 +1,27 @@
 export type TeachingInput = {
   topic: string;
   classLevel: string;
+  engagement?: "low" | "medium" | "high" | "very_high"; // ✅ optional
 };
 
 export type QuestionResponse = {
   questions: string[];
 };
 
+// export type Engagement = "low" | "medium" | "high" | "very_high";
+
+// export type FeedbackInput = {
+//   topic: string;
+//   subject: string;
+//   classLevel: string;
+//   engagement: Engagement;
+// };
+
 export type FeedbackInput = {
   // topic: string;
   // subject: string;
   // classLevel: string;
-  score: number;
+  // score: number;
   engagement: "low" | "medium" | "high" | "very_high";
 };
 

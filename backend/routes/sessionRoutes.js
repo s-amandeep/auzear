@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
   const normalizedTopic = topic.topic.trim().toLowerCase();
   console.log(normalizedTopic);
   const currentSubject = topic.subject;
-  const currentScore = topic.score;
+  // const currentScore = topic.score;
   const engagement = topic.engagement;
 
   const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp
@@ -17,6 +17,14 @@ router.post("/", async (req, res) => {
   let newMemory = 0.3; // default for new concept
   let daysToAdd = 1;
   const next_revision = new Date();
+
+  // Convert engagement to score
+  let currentScore;
+
+  if (engagement === "low") currentScore = 30;
+  else if (engagement === "medium") currentScore = 60;
+  else if (engagement === "high") currentScore = 80;
+  else currentScore = 95;
 
   // 1. Check if concept exists
   const { data: existing } = await supabase
