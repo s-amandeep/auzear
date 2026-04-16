@@ -4,8 +4,7 @@ const supabase = require("../config/supabase");
 
 router.get("/:childId", async (req, res) => {
   try {
-    const { childId } = req.params;
-    console.log("Revision API hit");
+    const { childId } = req.params;    
 
     const today = new Date().toISOString();
 
@@ -31,28 +30,11 @@ router.get("/:childId", async (req, res) => {
       return res.json({ revision: [], retentionScore: 0 });
     }
 
-    // 2. Fetch concept names separately (SAFE way)
-    // const conceptIds = states.map((s) => s.concept_id);
-
-    // const { data: concepts } = await supabase
-    //   .from("concepts")
-    //   .select("id, name, subject")
-    //   .in("id", conceptIds);
-
-    // 3. Merge data
-
-    // const conceptMap = {};
-
-    // concepts.forEach((c) => {
-    //   conceptMap[c.id] = c;
-    // });
 
     const revision = states.map((s) => ({
       ...s,
-      // conceptName: conceptMap[s.concept_id]?.name || "Unknown",
       conceptName: s.concepts.name || "Unknown",
-      subject: s.concepts.subject || "General",
-      // subject: conceptMap[s.concept_id]?.subject || "General",
+      subject: s.concepts.subject || "General",      
     }));
 
     const safeStates = revision || [];
@@ -87,6 +69,15 @@ router.get("/:childId", async (req, res) => {
     const weakestSubject = subjectStats[0] || null;
 
     // Subject-wise logic ends here
+
+    let learningPattern = "";
+    let guidance = "";
+
+    if (weakestSubject) {
+      learningPattern = `Child tends to struggle more with ${weakestSubject.subject} concepts.`;
+
+      guidance = `Try using more real-life examples while teaching ${weakestSubject.subject}. Keep explanations simple and interactive.`;
+    }
 
     // Weekly plan
 
@@ -148,6 +139,8 @@ router.get("/:childId", async (req, res) => {
       weakestSubject, // 🔥 new
       suggestion,
       weeklyPlan,
+      learningPattern,
+      guidance,
     });
   } catch (err) {
     console.error("Server error:", err);

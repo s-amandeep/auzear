@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import ConceptForm from "../components/ConceptForm";
-import TeachingCard from "../components/TeachingCard";
+import TeachingCard from "./components/TeachingCard";
+import QuestionsCard from "./components/QuestionsCard";
+import PrerequisiteCard from "./components/PrerequisiteCard";
+import ParentTip from "./components/ParentTip";
+import FeedbackPanel from "./components/FeedbackPanel";
 import { useTeaching } from "../../hooks/useTeaching";
 import { TeachingInput, QuestionResponse } from "../types";
 import { useRouter } from "next/navigation";
@@ -15,6 +19,8 @@ export default function TeachPage() {
   const [engagement, setEngagement] = useState<
     "low" | "medium" | "high" | "very_high" | ""
   >("");
+  const [hasStarted, setHasStarted] = useState(false);
+  const [hasResult, setHasResult] = useState(false);
 
   const {
     loading,
@@ -23,28 +29,24 @@ export default function TeachPage() {
     startTeaching,
     submitFeedback,
     parentTip,
+    prerequisite,
   } = useTeaching();
 
   const handleStart = async ({ topic, classLevel }: TeachingInput) => {
-    console.log("Starting teaching with:", { topic, classLevel });
-    setCurrentTopic(topic);
-    setCurrentClass(classLevel);
-    startTeaching({ topic, classLevel });
-  };
 
-  const engagementOptions = [
-    { label: "😕", value: "low" as const, text: "Didn't understand" },
-    { label: "🤔", value: "medium" as const, text: "Partially understood" },
-    { label: "😊", value: "high" as const, text: "Understood well" },
-    { label: "😄", value: "very_high" as const, text: "Enjoyed it" },
-  ];
+    try {
+      setHasStarted(true);
+      setHasResult(false); // 🔥 reset before call
 
-  const getButtonText = () => {
-    if (engagement === "low") return "Improve Explanation";
-    if (engagement === "medium") return "Explain Better";
-    if (engagement === "high") return "Make it Stronger";
-    if (engagement === "very_high") return "Challenge Further";
-    return "";
+      await startTeaching({ topic, classLevel });
+
+      // ✅ ONLY after success
+      setHasResult(true);
+    } catch (error) {
+      console.error(error);
+      setHasStarted(false);
+      setHasResult(false);
+    }
   };
 
   const handleFinalSave = async () => {
@@ -67,6 +69,8 @@ export default function TeachPage() {
   };
 
   const handleImprove = async () => {
+    setHasResult(false);
+    setEngagement("");
     await startTeaching({
       topic: currentTopic,
       classLevel: currentClass,
@@ -80,19 +84,48 @@ export default function TeachPage() {
 
       <ConceptForm onSubmit={handleStart} />
 
-      {loading && <p>Generating...</p>}
+      {/* {loading && <p>Generating...</p>} */}
+      {hasStarted && !hasResult && (
+        <p className="mt-4 text-gray-500">Generating lesson...</p>
+      )}
 
-      <TeachingCard data={result} />
-      {/* <div className="bg-white p-5 rounded-xl shadow max-w-md">
-        <h2 className="font-semibold mb-2">How to Teach</h2>       
-        <p className="text-gray-700">{result}</p>
-      </div> */}
+      {hasResult && result && <TeachingCard topic={currentTopic} teach={result} />}
+
+      {hasResult && parentTip && <ParentTip tip={parentTip} />}
+
+      {hasResult && prerequisite && <PrerequisiteCard data={prerequisite} />}
+
+      {hasResult && result && 
+      <QuestionsCard questions={questions?.questions} />}
+
+      {hasResult && result && (
+        <FeedbackPanel
+          engagement={engagement}
+          setEngagement={setEngagement}
+          onImprove={handleImprove}
+          onDone={handleFinalSave}
+        />
+      )}
+
+      {/* <TeachingCard data={result} />
 
       {parentTip && (
         <div className="mt-4 bg-yellow-50 border border-yellow-200 p-4 rounded-xl max-w-md">
           <p className="text-xs text-gray-500 mb-1">Teaching Tip</p>
 
           <p className="text-sm text-gray-800">💡 {parentTip}</p>
+        </div>
+      )}
+
+      {prerequisite && (
+        <div className="mt-4 bg-red-50 border border-red-200 p-4 rounded-xl max-w-md">
+          <p className="text-xs text-gray-500 mb-1">Possible Gap</p>
+
+          <p className="text-sm font-semibold text-gray-800">
+            {prerequisite.concept}
+          </p>
+
+          <p className="text-sm text-gray-700 mt-1">{prerequisite.explain}</p>
         </div>
       )}
 
@@ -104,18 +137,6 @@ export default function TeachPage() {
               {i + 1}. {q}
             </p>
           ))}
-
-          {/* <div className="flex gap-4 mt-4">
-            <button onClick={() => handleFeedbackClick(90)}>✅ Got it</button>
-
-            <button onClick={() => handleFeedbackClick(60)}>
-              ⚠️ Needs practice
-            </button>
-
-            <button onClick={() => handleFeedbackClick(30)}>
-              ❌ Didn’t understand
-            </button>
-          </div> */}
 
           <div className="mt-4">
             <p className="text-sm text-gray-500">How did your child respond?</p>
@@ -137,13 +158,13 @@ export default function TeachPage() {
           </div>
 
           {engagement && (
-              <button
-                className="mt-4 bg-black text-white px-4 py-2 rounded-xl"
-                onClick={handleImprove}
-              >
-                {getButtonText()}
-              </button>
-            )}
+            <button
+              className="mt-4 bg-black text-white px-4 py-2 rounded-xl"
+              onClick={handleImprove}
+            >
+              {getButtonText()}
+            </button>
+          )}
 
           {engagement && (
             <button
@@ -154,7 +175,7 @@ export default function TeachPage() {
             </button>
           )}
         </div>
-      )}
+      )} */}
     </main>
   );
 }

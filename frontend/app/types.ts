@@ -52,3 +52,15 @@ export type RevisionResponse = {
   suggestion: string;
   weeklyPlan: WeeklyPlanItem[];
 };
+
+export type InsightResponse = {
+  summary: string;
+
+  pattern: {
+    weakest_subject: string;
+    struggling_with: string;
+    reason: string;
+  };
+
+  guidance: string;
+};

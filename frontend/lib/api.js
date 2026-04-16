@@ -1,18 +1,7 @@
 import { FeedbackInput } from "../app/types";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// export async function fetchTeaching(topic, classLevel, child_id, engagement) {
-//   const res = await fetch(`${API_URL}/api/teaching`, {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ topic, classLevel, child_id, engagement }),
-//   });
-
-//   return res.json();
-// }
-export async function fetchTeaching(topic,
-    classLevel,
-    engagement) {
+export async function fetchTeaching(topic, classLevel, engagement) {
   const res = await fetch(`${API_URL}/api/teaching`, {
     method: "POST",
     headers: {
@@ -27,6 +16,7 @@ export async function fetchTeaching(topic,
   });
 
   const result = await res.json();
+  console.log("Fetched teaching:", result);
 
   if (!res.ok) {
     throw new Error(result.error || "Failed to fetch teaching");
@@ -42,7 +32,13 @@ export async function fetchQuestions(topic, classLevel) {
     body: JSON.stringify({ topic, classLevel }),
   });
 
-  return res.json();
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch questions");
+  }
+
+  return result;
 }
 
 export async function saveSession(
@@ -65,5 +61,47 @@ export async function saveSession(
   }
 
   alert("Session saved & revision scheduled!");
+  return data;
+}
+
+export async function fetchRevision() {
+  const res = await fetch(
+    `${API_URL}/api/revision/c3658790-741b-4823-be25-0822ba4e72df`,
+    // `${API_URL}/api/revision/${childId}`
+  );
+
+  const text = await res.text();
+  const data = JSON.parse(text);
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch revision");
+  }
+
+  return data;
+}
+
+export async function fetchInsights() {
+  // export async function fetchInsights(childId) {
+  const res = await fetch(
+    `${API_URL}/api/insights/c3658790-741b-4823-be25-0822ba4e72df`,
+    // `${API_URL}/api/insights/${childId}`
+  );
+
+  console.log("Fetched insights:", res);
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Backend error:", text);
+
+    throw new Error("Insights fetch failed");
+  }
+
+  const data = await res.json();
+
+  // const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch insights");
+  }
+
   return data;
 }

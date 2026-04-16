@@ -6,8 +6,17 @@ async function generateTeaching(req, res) {
   const { topic, classLevel, child_id, engagement } = req.body;
 
   try {
+    if (!topic || topic.length > 100) {
+      return res.status(400).json({ error: "Invalid topic input" });
+    }
+
     const normalizedTopic = topic.trim().toLowerCase();
-    console.log("Received topic:", normalizedTopic);
+
+    console.log("AI CALL:", {
+      endpoint: "teach",
+      topic,
+      time: new Date(),
+    });
 
     let parsed;
 
@@ -15,7 +24,12 @@ async function generateTeaching(req, res) {
       // 🔥 fetch past context
       const context = await getLearningContext(child_id, topic);
 
-      const prompt = getTeachingPrompt(normalizedTopic, classLevel, context, engagement);
+      const prompt = getTeachingPrompt(
+        normalizedTopic,
+        classLevel,
+        context,
+        engagement,
+      );
       const raw = await generateFromPrompt(prompt);
       parsed = JSON.parse(raw);
     } catch (e) {
@@ -28,6 +42,7 @@ async function generateTeaching(req, res) {
       teach: parsed.teach,
       questions: parsed.practice,
       parentTip: parsed.parent_tip,
+      prerequisite: parsed.prerequisite || null,
     });
     // res.json(parsed);
   } catch (err) {

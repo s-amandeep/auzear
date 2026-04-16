@@ -4,6 +4,12 @@ const { getQuestionPrompt } = require("../prompts/questionPrompt");
 async function generateQuestions(req, res) {
   const { topic, classLevel } = req.body;
 
+  console.log("AI CALL:", {
+    endpoint: "revision-questions",
+    topic: topic,
+    time: new Date(),
+  });
+
   try {
     const prompt = getQuestionPrompt(topic, classLevel);
 
@@ -18,7 +24,6 @@ async function generateQuestions(req, res) {
     }
 
     res.json({ data: parsed });
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
