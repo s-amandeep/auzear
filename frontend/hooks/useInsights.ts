@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { fetchInsights } from "../lib/api";
 import { InsightResponse } from "@/app/types";

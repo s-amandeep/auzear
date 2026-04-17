@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { fetchTeaching, saveSession } from "../lib/api";
 import { TeachingInput, QuestionResponse, FeedbackInput } from "../app/types";
