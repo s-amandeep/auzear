@@ -29,7 +29,8 @@ export default function UpcomingRevision({ items }: any) {
   };
 
   return (
-    <div className="w-full max-w-xl text-black rounded-2xl p-6">
+    // <div className="w-full max-w-xl text-black rounded-2xl p-6">
+    <div className="flex max-w-xl flex-col items-center gap-4 w-full">
       
 
       {!items || items.length === 0 ? (

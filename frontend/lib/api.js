@@ -1,12 +1,15 @@
 import { FeedbackInput } from "../app/types";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+const getHeaders = () => ({
+  "Content-Type": "application/json",
+  "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+});
+
 export async function fetchTeaching(topic, classLevel, engagement) {
   const res = await fetch(`${API_URL}/api/teaching`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getHeaders(),
     body: JSON.stringify({
       topic: topic,
       classLevel: classLevel,
@@ -28,7 +31,7 @@ export async function fetchTeaching(topic, classLevel, engagement) {
 export async function fetchQuestions(topic, classLevel) {
   const res = await fetch(`${API_URL}/api/questions`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getHeaders(),
     body: JSON.stringify({ topic, classLevel }),
   });
 
@@ -50,7 +53,7 @@ export async function saveSession(
 ) {
   const res = await fetch(`${API_URL}/api/session`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getHeaders(),
     body: JSON.stringify({ topic, subject, classLevel, engagement }),
   });
 
@@ -68,6 +71,10 @@ export async function fetchRevision() {
   const res = await fetch(
     `${API_URL}/api/revision/c3658790-741b-4823-be25-0822ba4e72df`,
     // `${API_URL}/api/revision/${childId}`
+    {
+      method: "GET",
+      headers: getHeaders(),   
+    },
   );
 
   const text = await res.text();
@@ -85,6 +92,10 @@ export async function fetchInsights() {
   const res = await fetch(
     `${API_URL}/api/insights/c3658790-741b-4823-be25-0822ba4e72df`,
     // `${API_URL}/api/insights/${childId}`
+    {
+      method: "GET",
+      headers: getHeaders(),     
+    },
   );
 
   console.log("Fetched insights:", res);
