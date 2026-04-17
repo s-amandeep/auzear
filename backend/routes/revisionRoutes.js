@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const supabase = require("../config/supabase");
+const checkApiKey = require("../middleware/authMiddleware");
 
-router.get("/:childId", async (req, res) => {
+router.get("/:childId", checkApiKey, async (req, res) => {
   try {
     const { childId } = req.params;    
 

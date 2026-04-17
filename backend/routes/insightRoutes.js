@@ -4,8 +4,9 @@ const supabase = require("../config/supabase");
 const { getInsightPrompt } = require("../prompts/insightPrompt");
 const { generateFromPrompt } = require("../services/aiService");
 const { aiLimiter } = require("../middleware/rateLimiter");
+const checkApiKey = require("../middleware/authMiddleware");
 
-router.get("/:childId", aiLimiter, async (req, res) => {
+router.get("/:childId", checkApiKey, aiLimiter, async (req, res) => {
   
 
   const { childId } = req.params;

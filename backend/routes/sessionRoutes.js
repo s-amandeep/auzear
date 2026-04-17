@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const supabase = require("../config/supabase");
+const checkApiKey = require("../middleware/authMiddleware");
 
-router.post("/", async (req, res) => {
+router.post("/", checkApiKey, async (req, res) => {
   const { topic } = req.body;
 
-  console.log(topic);
+  // console.log(topic);
   const normalizedTopic = topic.topic.trim().toLowerCase();
-  console.log(normalizedTopic);
+  // console.log(normalizedTopic);
   const currentSubject = topic.subject;
   // const currentScore = topic.score;
   const engagement = topic.engagement;
@@ -101,7 +102,7 @@ router.post("/", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 
-  console.log("Saved successfully:", data);
+  // console.log("Saved successfully:", data);
 
   const { data: sessionData, error: sessionError } = await supabase
     .from("sessions")
@@ -122,7 +123,7 @@ router.post("/", async (req, res) => {
     return res.status(500).json({ error: sessionError.message });
   }
 
-  console.log("✅ Session saved:", sessionData);
+  // console.log("✅ Session saved:", sessionData);
 
   res.json({ success: true });
 });

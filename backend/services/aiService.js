@@ -8,7 +8,7 @@ async function generateFromPrompt(prompt) {
   const response = await client.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [{ role: "user", content: prompt }],
-    max_tokens: 300, // 🔥 ADD HERE    
+    // max_tokens: 300, // 🔥 ADD HERE    
   });
 
   return response.choices[0].message.content;
