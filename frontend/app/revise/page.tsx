@@ -1,32 +1,33 @@
 "use client";
 
 export const dynamic = "force-dynamic";
-
+export const fetchCache = "force-no-store"; // 🔥 ADD THIS
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { fetchQuestions } from "../../lib/api";
 
 export default function RevisePage() {
   const params = useSearchParams();
-  const concept = params.get("concept");
+  // const concept = params.get("concept");
+  const concept = params?.get("concept") || "";
 
   const [questions, setQuestions] = useState<any>(null);  
-
-  useEffect(() => {
-    if (!concept) return;
-    loadQuestions();
-  }, [concept]);
 
   if (!concept) {
     return <p className="text-center mt-10">Loading...</p>;
   }
+
+  useEffect(() => {
+    if (!concept) return;
+    loadQuestions();
+  }, [concept]);  
 
   const loadQuestions = async () => {
     if (!concept) return; // 🔥 VERY IMPORTANT
 
     try {
       const res = await fetchQuestions(concept, "3");
-      setQuestions(res.data || []);
+      setQuestions(res?.data || []);
     } catch (err) {
       console.error("Failed to load questions");
     }
