@@ -7,6 +7,7 @@ const getHeaders = () => ({
 });
 
 export async function fetchTeaching(topic, classLevel, engagement) {
+  console.log("API CALL:", `${API_URL}/api/teaching`);
   const res = await fetch(`${API_URL}/api/teaching`, {
     method: "POST",
     headers: getHeaders(),
