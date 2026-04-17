@@ -25,7 +25,8 @@ export default function UpcomingRevision({ items }: any) {
   };
   // if (!items?.length) return null;
   const handleRevise = (item: any) => {
-    router.push(`/revise?concept=${item.conceptName}`);
+    // router.push(`/revise?concept=${item.conceptName}`);
+    router.push(`/revise/${encodeURIComponent(item.conceptName)}`);
   };
 
   return (
