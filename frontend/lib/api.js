@@ -20,7 +20,7 @@ export async function fetchTeaching(topic, classLevel, engagement) {
   });
 
   const result = await res.json();
-  console.log("Fetched teaching:", result);
+  // console.log("Fetched teaching:", result);
 
   if (!res.ok) {
     throw new Error(result.error || "Failed to fetch teaching");

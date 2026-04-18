@@ -20,6 +20,7 @@ export function useTeaching() {
 
     const teaching = await fetchTeaching(topic, classLevel, engagement);
 
+    console.log("Received teaching:", teaching);
     setCurrentTopic(teaching.topic);
     setCurrentSubject(teaching.subject);
     setResult(teaching.teach);

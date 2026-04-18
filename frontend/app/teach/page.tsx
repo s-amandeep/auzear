@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 export default function TeachPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [currentTopic, setCurrentTopic] = useState("");
+  // const [currentTopic, setCurrentTopic] = useState("");
   const [currentClass, setCurrentClass] = useState("");
   const [engagement, setEngagement] = useState<
     "low" | "medium" | "high" | "very_high" | ""
@@ -24,6 +24,7 @@ export default function TeachPage() {
 
   const {
     loading,
+    currentTopic,
     result,
     questions,
     startTeaching,
@@ -33,7 +34,6 @@ export default function TeachPage() {
   } = useTeaching();
 
   const handleStart = async ({ topic, classLevel }: TeachingInput) => {
-
     try {
       setHasStarted(true);
       setHasResult(false); // 🔥 reset before call
@@ -69,13 +69,24 @@ export default function TeachPage() {
   };
 
   const handleImprove = async () => {
-    setHasResult(false);
-    setEngagement("");
-    await startTeaching({
-      topic: currentTopic,
-      classLevel: currentClass,
-      ...(engagement && { engagement }), // 🔥 only difference
-    });
+    if (!currentTopic) return;
+
+    try {
+      setHasStarted(true);
+      setHasResult(false); // 🔥 reset before call
+
+      await startTeaching({
+        topic: currentTopic,
+        classLevel: currentClass,
+        ...(engagement && { engagement }), // 🔥 only difference
+      });
+      // ✅ ONLY after success
+      setHasResult(true);
+    } catch (error) {
+      console.error(error);
+      setHasStarted(false);
+      setHasResult(false);
+    }
   };
 
   return (
@@ -89,14 +100,17 @@ export default function TeachPage() {
         <p className="mt-4 text-gray-500">Generating lesson...</p>
       )}
 
-      {hasResult && result && <TeachingCard topic={currentTopic} teach={result} />}
+      {hasResult && result && (
+        <TeachingCard topic={currentTopic} teach={result} />
+      )}
 
       {hasResult && parentTip && <ParentTip tip={parentTip} />}
 
       {hasResult && prerequisite && <PrerequisiteCard data={prerequisite} />}
 
-      {hasResult && result && 
-      <QuestionsCard questions={questions?.questions} />}
+      {hasResult && result && (
+        <QuestionsCard questions={questions?.questions} />
+      )}
 
       {hasResult && result && (
         <FeedbackPanel
