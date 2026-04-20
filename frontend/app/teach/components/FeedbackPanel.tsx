@@ -19,7 +19,7 @@ export default function FeedbackPanel({
   ];
 
   const getButtonText = () => {
-    if (engagement === "low") return "Improve Explanation";
+    if (engagement === "low") return "Make it easier to understand";
     if (engagement === "medium") return "Explain Better";
     if (engagement === "high") return "Make it Stronger";
     if (engagement === "very_high") return "Challenge Further";

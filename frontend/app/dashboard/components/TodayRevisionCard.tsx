@@ -24,6 +24,12 @@ export default function TodayRevisionCard({ items }: any) {
     };
   };
 
+  const getStatus = (memory: number) => {
+    if (memory < 0.4) return "Needs Support 🌱";
+    if (memory < 0.7) return "Building Up 💪";
+    return "Strong Understanding ⭐";
+  };
+
   const handleRevise = (item: any) => {
     // router.push(`/revise?concept=${item.conceptName}`);
     router.push(`/revise/${encodeURIComponent(item.conceptName)}`);
@@ -49,7 +55,7 @@ export default function TodayRevisionCard({ items }: any) {
             </button>
           ) : (
             items.map((item: any, index: number) => {
-              const style = getStyles(item.status);
+              const style = getStyles(getStatus(item.memory_strength));
 
               return (
                 <div

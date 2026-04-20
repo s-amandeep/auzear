@@ -6,11 +6,13 @@ import { useRevision } from "../../hooks/useRevision";
 import UpcomingRevision from "./components/UpcomingRevision";
 import FocusCard from "./components/FocusCard";
 import WeeklyPlan from "./components/WeeklyPlan";
+import { trackEvent } from "@/lib/analytics";
 
 export default function Plan() {
   const { startRevision, upcoming, suggestion, weeklyPlan } = useRevision();
 
   useEffect(() => {
+    trackEvent("plan_clicked", {});
     startRevision();
   }, []);
 

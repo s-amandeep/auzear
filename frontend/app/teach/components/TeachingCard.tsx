@@ -9,8 +9,8 @@ export default function TeachingCard({ topic, teach }: Props) {
       {/* <p className="text-xs text-gray-500">{subject}</p> */}
       {/* <h2 className="text-xl font-semibold mb-4">{topic}</h2> */}
 
-      <p className="text-sm text-gray-500 mb-1">How to Teach</p>
-      <p className="text-xs text-gray-400 mb-1">A simple way to explain this</p>
+      <p className="text-sm text-gray-500 mb-1">How to explain this simply 👇</p>
+      {/* <p className="text-xs text-gray-400 mb-1">A simple way to explain this</p> */}
       <p className="text-gray-800 leading-relaxed">{teach}</p>
     </div>
   );

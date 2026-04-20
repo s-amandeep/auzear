@@ -23,6 +23,13 @@ export default function UpcomingRevision({ items }: any) {
       label: "Weak",
     };
   };
+
+  const getStatus = (memory: number) => {
+    if (memory < 0.4) return "Needs Support 🌱";
+    if (memory < 0.7) return "Building Up 💪";
+    return "Strong Understanding ⭐";
+  };
+
   // if (!items?.length) return null;
   const handleRevise = (item: any) => {
     // router.push(`/revise?concept=${item.conceptName}`);
@@ -32,13 +39,11 @@ export default function UpcomingRevision({ items }: any) {
   return (
     // <div className="w-full max-w-xl text-black rounded-2xl p-6">
     <div className="flex max-w-xl flex-col items-center gap-4 w-full">
-      
-
       {!items || items.length === 0 ? (
         <p className="text-gray-500">Great job! No upcoming revisions 🎉</p>
       ) : (
         items.map((item: any, index: number) => {
-          const style = getStyles(item.status);
+          const style = getStyles(getStatus(item.memory_strength));
 
           return (
             <div

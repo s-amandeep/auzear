@@ -23,7 +23,7 @@ export default function ConceptForm({
     >
       <input
         type="text"
-        placeholder="Enter topic (e.g., Fractions)"
+        placeholder="What would you like to teach today? (e.g., Fractions)"
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
         className="border p-3 rounded-lg"

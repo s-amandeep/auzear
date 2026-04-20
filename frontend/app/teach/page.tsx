@@ -10,6 +10,7 @@ import FeedbackPanel from "./components/FeedbackPanel";
 import { useTeaching } from "../../hooks/useTeaching";
 import { TeachingInput, QuestionResponse } from "../types";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/analytics";
 
 export default function TeachPage() {
   const router = useRouter();
@@ -31,14 +32,17 @@ export default function TeachPage() {
     submitFeedback,
     parentTip,
     prerequisite,
+    error,
   } = useTeaching();
 
   const handleStart = async ({ topic, classLevel }: TeachingInput) => {
+    trackEvent("teach_started", { topic });
     try {
       setHasStarted(true);
       setHasResult(false); // 🔥 reset before call
 
       await startTeaching({ topic, classLevel });
+      setCurrentClass(classLevel);
 
       // ✅ ONLY after success
       setHasResult(true);
@@ -50,6 +54,7 @@ export default function TeachPage() {
   };
 
   const handleFinalSave = async () => {
+    trackEvent("done_clicked", { currentTopic });
     try {
       if (!engagement) {
         alert("Please select how your child responded");
@@ -69,6 +74,7 @@ export default function TeachPage() {
   };
 
   const handleImprove = async () => {
+    trackEvent("teach_started", { currentTopic, engagement });
     if (!currentTopic) return;
 
     try {
@@ -98,6 +104,10 @@ export default function TeachPage() {
       {/* {loading && <p>Generating...</p>} */}
       {hasStarted && !hasResult && (
         <p className="mt-4 text-gray-500">Generating lesson...</p>
+      )}
+
+      {error && (
+        <p className="text-sm text-red-500 text-center mt-2">{error}</p>
       )}
 
       {hasResult && result && (

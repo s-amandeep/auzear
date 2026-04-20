@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import { useInsights } from "../../hooks/useInsights";
 import { useEffect, useState } from "react";
 
@@ -7,6 +8,7 @@ export default function Insights() {
   const { data, loading, fetchData } = useInsights();
 
   useEffect(() => {
+    trackEvent("insights_clicked", {});
     fetchData();
   }, []);
 

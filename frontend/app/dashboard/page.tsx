@@ -7,6 +7,7 @@ import RetentionCard from "./components/RetentionCard";
 import TodayRevisionCard from "./components/TodayRevisionCard";
 import InsightCard from "./components/InsightCard";
 import { useRevision } from "../../hooks/useRevision";
+import { trackEvent } from "@/lib/analytics";
 
 export default function Dashboard() {
 
@@ -25,6 +26,7 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
+    trackEvent("dashboard_clicked", {});
     startRevision();
   }, []);
 
