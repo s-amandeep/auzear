@@ -24,14 +24,14 @@ async function generateTeaching(req, res) {
     try {
       // 🔥 fetch past context
       const context = await getLearningContext(child_id, topic);
-      console.log("context" , context);
+      // console.log("context" , context);
       const prompt = getTeachingPrompt(
         normalizedTopic,
         classLevel,
         context,
         engagement,
       );
-      console.log("prompt" , prompt);
+      // console.log("prompt" , prompt);
       const raw = await generateFromPrompt(prompt);
 
       parsed = JSON.parse(raw);
