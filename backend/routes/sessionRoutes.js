@@ -6,17 +6,12 @@ const checkApiKey = require("../middleware/authMiddleware");
 router.post("/", checkApiKey, async (req, res) => {
   const { topic } = req.body;
 
-  // console.log(topic);
   const normalizedTopic = topic.topic.trim().toLowerCase();
-  // console.log(normalizedTopic);
   const currentSubject = topic.subject;
-  // const currentScore = topic.score;
   const engagement = topic.engagement;
 
   const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp
   let concept_id;
-  let newMemory = 0.3; // default for new concept
-  let daysToAdd = 1;
   const next_revision = new Date();
 
   // Convert engagement to score
@@ -58,24 +53,36 @@ router.post("/", checkApiKey, async (req, res) => {
     .eq("concept_id", concept_id)
     .maybeSingle();
 
-  if (existingState) {
-    const prev = existingState.memory_strength || 0;
+  // if (existingState) {
+  // const prev = existingState.memory_strength || 0;
+  const prevScore = existingState?.understanding_score || 0;
+  const prevLevel = existingState?.revision_level || 1;
+  const prevMemory = existingState?.memory_strength || 0.3;
 
-    // if (score >= 80) newMemory = Math.min(prev + 0.2, 1);
-    // else if (score >= 50) newMemory = prev + 0.05;
-    // else newMemory = Math.max(prev - 0.2, 0);
+  let trend = "stable";
 
-    if (currentScore >= 80) newMemory = Math.min(prev + 0.2, 1);
-    else if (currentScore >= 50) newMemory = prev + 0.05;
-    else newMemory = Math.max(prev - 0.2, 0);
+  if (currentScore > prevScore + 10) trend = "improving";
+  else if (currentScore < prevScore - 10) trend = "declining";
+
+  let newMemory = prevMemory;
+
+  // Smooth update instead of reset
+  newMemory = 0.7 * prevMemory + 0.3 * (currentScore / 100);
+  
+  let newLevel = prevLevel;
+
+  if (currentScore >= 80 && trend !== "declining") {
+    newLevel = Math.min(prevLevel + 1, 5);
+  } else if (currentScore < 40) {
+    newLevel = Math.max(prevLevel - 1, 1);
   }
 
-  if (newMemory > 0.8) daysToAdd = 7;
-  else if (newMemory > 0.6) daysToAdd = 4;
-  else if (newMemory > 0.4) daysToAdd = 2;
-  else daysToAdd = 1;
+  let nextRevisionDays = 1;
 
-  next_revision.setDate(next_revision.getDate() + daysToAdd);
+  if (newMemory > 0.7) nextRevisionDays = 3;
+  if (newMemory > 0.85) nextRevisionDays = 5;
+
+  next_revision.setDate(next_revision.getDate() + nextRevisionDays);
 
   // 3. Upsert learning state
   const { data, error } = await supabase.from("learning_states").upsert(
@@ -83,13 +90,13 @@ router.post("/", checkApiKey, async (req, res) => {
       {
         child_id,
         concept_id,
-        // understanding_score: score,
         understanding_score: currentScore,
         memory_strength: newMemory,
         last_learned_at: new Date(),
         next_revision_at: next_revision,
-        status:
-          newMemory > 0.7 ? "strong" : newMemory > 0.4 ? "medium" : "weak",
+        memory_strength: newMemory,
+        revision_level: newLevel,
+        trend: trend,
       },
     ],
     {
@@ -102,8 +109,6 @@ router.post("/", checkApiKey, async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 
-  // console.log("Saved successfully:", data);
-
   const { data: sessionData, error: sessionError } = await supabase
     .from("sessions")
     .insert([
@@ -111,7 +116,6 @@ router.post("/", checkApiKey, async (req, res) => {
         child_id,
         concept_id,
         duration: 0,
-        // accuracy: score,
         accuracy: currentScore,
         engagement,
       },
@@ -122,8 +126,6 @@ router.post("/", checkApiKey, async (req, res) => {
     console.error("❌ Session insert failed:", sessionError);
     return res.status(500).json({ error: sessionError.message });
   }
-
-  // console.log("✅ Session saved:", sessionData);
 
   res.json({ success: true });
 });

@@ -1,12 +1,6 @@
 function getTeachingPrompt(input, classLevel, context, engagement) {
-  // let contextBlock = "";
   let improvementBlock = "";
   let prerequisiteBlock = "";
-
-  // - what parent should say/do
-
-  // if (context && context.state) {
-  //   contextBlock = `
 
   if (engagement) {
     improvementBlock = `

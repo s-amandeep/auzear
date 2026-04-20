@@ -1,6 +1,7 @@
 const { generateFromPrompt } = require("../services/aiService");
 const { getTeachingPrompt } = require("../prompts/teachingPrompt");
 const { getLearningContext } = require("../utils/getLearningContext");
+const { raw } = require("express");
 
 async function generateTeaching(req, res) {
   const { topic, classLevel, child_id, engagement } = req.body;
@@ -23,18 +24,22 @@ async function generateTeaching(req, res) {
     try {
       // 🔥 fetch past context
       const context = await getLearningContext(child_id, topic);
-
+      console.log("context" , context);
       const prompt = getTeachingPrompt(
         normalizedTopic,
         classLevel,
         context,
         engagement,
       );
+      console.log("prompt" , prompt);
       const raw = await generateFromPrompt(prompt);
+
       parsed = JSON.parse(raw);
     } catch (e) {
       return res.status(500).json({ error: "Invalid AI response" });
     }
+
+    // console.log(raw);
 
     res.json({
       topic: parsed.topic,
