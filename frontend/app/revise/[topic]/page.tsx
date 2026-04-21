@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { fetchQuestions, saveSession } from "../../../lib/api";
+import { fetchQuestions, saveSession, submitRevisionFeedback } from "../../../lib/api";
 import { trackEvent } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 
@@ -10,7 +10,6 @@ export default function RevisePage() {
   const params = useParams();
   const router = useRouter();
 
-  
   const [engagement, setEngagement] = useState<
     "low" | "medium" | "high" | "very_high" | ""
   >("");
@@ -89,33 +88,76 @@ export default function RevisePage() {
   };
 
   const handleRevisionFeedback = async () => {
-      if (!engagement) return;
+    if (!engagement) return;
 
-      trackEvent("revision_feedback_submitted", {
+    trackEvent("revision_feedback_submitted", {
       topic: concept,
       engagement: engagement,
     });
 
-      try {
-        await saveSession({  
-          topic: concept,
-          // subject: currentSubject || "General",
-          // classLevel: currentClass,
-          subject: "General",
-          classLevel: 1,          
-          engagement,
-        });
-        // return result; // ✅ important
-        router.push("/dashboard");
-      } catch (error) {
-        console.error("Error saving session:", error);
-        throw error; // propagate to UI
-      }
-    };
+    try {
+      // await saveSession({
+      //   topic: concept,
+      //   // subject: currentSubject || "General",
+      //   // classLevel: currentClass,
+      //   subject: "General",
+      //   classLevel: 1,
+      //   engagement,
+      // });
+      await submitRevisionFeedback({
+        topic: concept,
+        engagement: engagement,
+        child_id: "c3658790-741b-4823-be25-0822ba4e72df", // TODO: get actual child ID
+      });
+      // return result; // ✅ important
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error saving session:", error);
+      throw error; // propagate to UI
+    }
+  };
 
   return (
     <main className="p-6 flex flex-col items-center gap-6">
-      {trend && (
+      {/* {trend && (
+        <div className="mt-6 text-center">
+          {trend === "improving" && (
+            <p className="text-green-600">
+              Great! Your child is progressing well 🚀
+            </p>
+          )}
+
+          {trend === "stable" && (
+            <p className="text-gray-600">
+              Good progress! Let’s strengthen this further 💪
+            </p>
+          )}
+
+          {trend === "declining" && (
+            <p className="text-red-500">
+              Let’s revisit basics to build confidence 🌱
+            </p>
+          )}
+        </div>
+      )} */}
+
+      <h1 className="text-2xl font-bold">Revise: {concept}</h1>
+
+      <p className="text-sm text-gray-500 mb-2">
+        Level {revision_level} Practice
+      </p>
+
+      <div className="w-full max-w-xl mx-auto mt-4 flex flex-col gap-4 text-left">
+        {questions?.questions?.map((q: string, i: number) => (
+          <div key={i} className="p-4 bg-white rounded-2xl shadow text-left">
+            <p className="text-gray-800 font-medium">
+              {i + 1}. {q}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {!questions && trend && (
         <div className="mt-6 text-center">
           {trend === "improving" && (
             <p className="text-green-600">
@@ -136,22 +178,6 @@ export default function RevisePage() {
           )}
         </div>
       )}
-
-      <h1 className="text-2xl font-bold">Revise: {concept}</h1>
-
-      <p className="text-sm text-gray-500 mb-2">
-        Level {revision_level} Practice
-      </p>
-
-      <div className="w-full max-w-xl mx-auto mt-4 flex flex-col gap-4 text-left">
-        {questions?.questions?.map((q: string, i: number) => (
-          <div key={i} className="p-4 bg-white rounded-2xl shadow text-left">
-            <p className="text-gray-800 font-medium">
-              {i + 1}. {q}
-            </p>
-          </div>
-        ))}
-      </div>
 
       {questions && (
         <div className="mt-6 text-center">

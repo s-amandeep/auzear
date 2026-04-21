@@ -158,3 +158,13 @@ export async function fetchInsights() {
     };
   }
 }
+
+export async function submitRevisionFeedback(data) {
+  const res = await fetch(`${API_URL}/api/revision/feedback`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  return res.json();
+}

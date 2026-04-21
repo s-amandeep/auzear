@@ -53,8 +53,6 @@ router.post("/", checkApiKey, async (req, res) => {
     .eq("concept_id", concept_id)
     .maybeSingle();
 
-  // if (existingState) {
-  // const prev = existingState.memory_strength || 0;
   const prevScore = existingState?.understanding_score || 0;
   const prevLevel = existingState?.revision_level || 1;
   const prevMemory = existingState?.memory_strength || 0.3;
@@ -91,7 +89,6 @@ router.post("/", checkApiKey, async (req, res) => {
         child_id,
         concept_id,
         understanding_score: currentScore,
-        memory_strength: newMemory,
         last_learned_at: new Date(),
         next_revision_at: next_revision,
         memory_strength: newMemory,

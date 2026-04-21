@@ -5,7 +5,7 @@ const checkApiKey = require("../middleware/authMiddleware");
 
 router.get("/:childId", checkApiKey, async (req, res) => {
   try {
-    const { childId } = req.params;    
+    const { childId } = req.params;
 
     const today = new Date().toISOString();
 
@@ -31,11 +31,10 @@ router.get("/:childId", checkApiKey, async (req, res) => {
       return res.json({ revision: [], retentionScore: 0 });
     }
 
-
     const revision = states.map((s) => ({
       ...s,
       conceptName: s.concepts.name || "Unknown",
-      subject: s.concepts.subject || "General",      
+      subject: s.concepts.subject || "General",
     }));
 
     const safeStates = revision || [];
@@ -146,6 +145,90 @@ router.get("/:childId", checkApiKey, async (req, res) => {
   } catch (err) {
     console.error("Server error:", err);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/feedback", async (req, res) => {
+  try {
+    const { topic, engagement, child_id } = req.body;
+
+    // Convert engagement to score
+    let currentScore;
+
+    if (engagement === "low") currentScore = 30;
+    else if (engagement === "medium") currentScore = 60;
+    else if (engagement === "high") currentScore = 80;
+    else currentScore = 95;
+
+    // 1. Find concept
+    const { data: concept } = await supabase
+      .from("concepts")
+      .select("id")
+      .ilike("name", topic)
+      .single();
+
+    if (!concept) {
+      return res.status(404).json({ error: "Concept not found" });
+    }
+
+    // 2. Get existing state
+    const { data: existing } = await supabase
+      .from("learning_states")
+      .select("*")
+      .eq("concept_id", concept.id)
+      .eq("child_id", child_id)
+      .single();
+
+    if (!existing) {
+      return res.status(404).json({ error: "Learning state not found" });
+    }
+
+    // 3. Apply SAME logic as teaching
+    const prevScore = existing?.understanding_score || 0;
+    const prevMemory = existing?.memory_strength || 0.3;
+    const prevLevel = existing?.revision_level || 1;
+
+    // Trend
+    let trend = "stable";
+    if (currentScore > prevScore + 10) trend = "improving";
+    else if (currentScore < prevScore - 10) trend = "declining";
+
+    // Memory
+    const newMemory = 0.7 * prevMemory + 0.3 * (currentScore / 100);
+
+    // Level
+    let newLevel = prevLevel;
+    if (currentScore >= 80 && trend !== "declining") {
+      newLevel = Math.min(prevLevel + 1, 5);
+    } else if (currentScore < 40) {
+      newLevel = Math.max(prevLevel - 1, 1);
+    }
+
+    // Next revision
+    let days = 1;
+    if (newMemory > 0.7) days = 3;
+    if (newMemory > 0.85) days = 5;
+
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + days);
+
+    // 4. Update DB
+    await supabase
+      .from("learning_states")
+      .update({
+        understanding_score: currentScore,
+        memory_strength: newMemory,
+        revision_level: newLevel,
+        trend: trend,
+        next_revision_at: nextDate,
+        last_learned_at: new Date(),
+      })
+      .eq("id", existing.id);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save revision feedback" });
   }
 });
 
