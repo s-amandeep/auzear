@@ -37,7 +37,6 @@ export default function UpcomingRevision({ items }: any) {
   };
 
   return (
-    // <div className="w-full max-w-xl text-black rounded-2xl p-6">
     <div className="flex max-w-xl flex-col items-center gap-4 w-full">
       {!items || items.length === 0 ? (
         <p className="text-gray-500">Great job! No upcoming revisions 🎉</p>
@@ -90,7 +89,7 @@ export default function UpcomingRevision({ items }: any) {
                   className="bg-black text-white px-3 py-1 rounded-lg text-sm"
                   onClick={() => handleRevise(item)}
                 >
-                  Revise
+                  Practice
                 </button>
               </div>
             </div>
