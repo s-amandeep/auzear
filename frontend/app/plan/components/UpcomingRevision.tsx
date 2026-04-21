@@ -7,27 +7,27 @@ export default function UpcomingRevision({ items }: any) {
       return {
         bg: "bg-green-50",
         text: "text-green-700",
-        label: "Strong",
+        label: "Strong Understanding ⭐",
       };
     }
     if (status === "medium") {
       return {
         bg: "bg-yellow-50",
         text: "text-yellow-700",
-        label: "Needs Practice",
+        label: "Building Up 💪",
       };
     }
     return {
       bg: "bg-red-50",
       text: "text-red-700",
-      label: "Weak",
+      label: "Needs Support 🌱",
     };
   };
 
   const getStatus = (memory: number) => {
-    if (memory < 0.4) return "Needs Support 🌱";
-    if (memory < 0.7) return "Building Up 💪";
-    return "Strong Understanding ⭐";
+    if (memory < 0.4) return "low";
+    if (memory < 0.7) return "medium";
+    return "strong";
   };
 
   // if (!items?.length) return null;

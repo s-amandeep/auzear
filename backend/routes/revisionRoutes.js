@@ -17,7 +17,10 @@ router.get("/:childId", checkApiKey, async (req, res) => {
       .select(
         `
           *,
-          concepts (name, subject)
+          concepts (name, subject),
+          children (
+            streak_count
+          )
         `,
       )
       .eq("child_id", childId);
@@ -36,6 +39,9 @@ router.get("/:childId", checkApiKey, async (req, res) => {
       conceptName: s.concepts.name || "Unknown",
       subject: s.concepts.subject || "General",
     }));
+
+    // const streak = states?.[0]?.children?.streak_count || 0;
+    // console.log("Streak count:", streak);
 
     const safeStates = revision || [];
 
@@ -213,6 +219,32 @@ router.post("/feedback", async (req, res) => {
     nextDate.setDate(nextDate.getDate() + days);
 
     // 4. Update DB
+
+    // const today = new Date().toDateString();
+    // const { data: existingChild } = await supabase
+    //   .from("children")
+    //   .select("*")
+    //   .eq("child_id", child_id)
+    //   .single();
+
+    // const lastActive = existingChild.last_active_date;
+
+    // let newStreak = existingChild.streak_count || 0;
+
+    // if (lastActive === yesterday) {
+    //   newStreak += 1;
+    // } else if (lastActive !== today) {
+    //   newStreak = 1;
+    // }
+
+    // await supabase
+    //   .from("children")
+    //   .update({
+    //     last_active_date: today,
+    //     streak_count: newStreak,
+    //   })
+    //   .eq("id", child_id);
+
     await supabase
       .from("learning_states")
       .update({

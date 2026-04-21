@@ -8,15 +8,6 @@ export type QuestionResponse = {
   questions: string[];
 };
 
-// export type Engagement = "low" | "medium" | "high" | "very_high";
-
-// export type FeedbackInput = {
-//   topic: string;
-//   subject: string;
-//   classLevel: string;
-//   engagement: Engagement;
-// };
-
 export type FeedbackInput = {
   // topic: string;
   // subject: string;
@@ -63,4 +54,12 @@ export type InsightResponse = {
   };
 
   guidance: string;
+};
+
+export type ProfileResponse = {
+  name: string;
+  class: string;
+  age: number;
+  streak_count: number;
+  last_active_date: Date;
 };

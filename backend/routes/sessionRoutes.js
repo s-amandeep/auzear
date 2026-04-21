@@ -82,6 +82,29 @@ router.post("/", checkApiKey, async (req, res) => {
 
   next_revision.setDate(next_revision.getDate() + nextRevisionDays);
 
+  // const today = new Date().toDateString();
+  //   const { childData } = await supabase
+  //     .from("children")
+  //     .select("*")
+  //     .eq("child_id", child_id)
+  //     .single();
+
+  //   console.log("Existing child data:", childData);
+  //   const lastActive = childData.last_active_date;
+
+  //   let newStreak = childData.streak_count || 0;
+
+  //   if (lastActive === yesterday) {
+  //     newStreak += 1;
+  //   } else if (lastActive !== today) {
+  //     newStreak = 1;
+  //   }
+
+  //   await supabase.from("children").update({
+  //     last_active_date: today,
+  //     streak_count: newStreak,
+  //   });
+
   // 3. Upsert learning state
   const { data, error } = await supabase.from("learning_states").upsert(
     [

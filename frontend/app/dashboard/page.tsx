@@ -9,20 +9,17 @@ import InsightCard from "./components/InsightCard";
 import { useRevision } from "../../hooks/useRevision";
 import { trackEvent } from "@/lib/analytics";
 
-export default function Dashboard() {
 
+export default function Dashboard() {
   const {
     loading,
     startRevision,
     revisionList,
-    upcoming,
     retentionScore,
-    subjectStats,
-    weakestSubject,
     suggestion,
-    weeklyPlan,
   } = useRevision();
-
+ 
+  
   const router = useRouter();
 
   useEffect(() => {
@@ -35,11 +32,15 @@ export default function Dashboard() {
       <h1 className="text-3xl font-semibold">Your Child's Learning</h1>
       <p className="text-gray-500">Track progress and guide improvement</p>
 
-      <RetentionCard score={retentionScore} />
+      {/* <p className="text-xs text-gray-500 text-center">
+        You’ve been teaching for  days in a row 🌱
+      </p>   */}      
 
       <TodayRevisionCard items={revisionList} />
 
       <InsightCard text={suggestion} />
+
+      <RetentionCard score={retentionScore} />
 
       <button
         className="mt-4 bg-black text-white px-4 py-2 rounded-xl"
@@ -47,7 +48,7 @@ export default function Dashboard() {
       >
         Start Teaching
       </button>
-      
+
       {/* <h2 className="text-xl font-semibold">Subject Performance</h2>
 
       {subjectStats.length === 0 ? (
@@ -79,7 +80,6 @@ export default function Dashboard() {
           <p className="text-sm text-gray-600">Needs attention</p>
         </div>
       )} */}
-     
     </main>
   );
 }

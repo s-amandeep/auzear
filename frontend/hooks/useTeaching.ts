@@ -30,7 +30,7 @@ export function useTeaching() {
       return;
     }
 
-    console.log("Received teaching:", teaching);
+    // console.log("Received teaching:", teaching);
     setCurrentTopic(teaching.topic);
     setCurrentSubject(teaching.subject);
     setResult(teaching.teach);

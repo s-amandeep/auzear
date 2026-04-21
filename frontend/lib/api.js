@@ -77,6 +77,7 @@ export async function saveSession(
     });
 
     const data = await res.json();
+    // console.log("Saved session:", data);
 
     if (!res.ok) {
       throw new Error(data.error || "Failed to save session");
@@ -133,7 +134,7 @@ export async function fetchInsights() {
       },
     );
 
-    console.log("Fetched insights:", res);
+    // console.log("Fetched insights:", res);
     if (!res.ok) {
       const text = await res.text();
       console.error("Backend error:", text);
@@ -142,12 +143,6 @@ export async function fetchInsights() {
     }
 
     const data = await res.json();
-
-    // const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to fetch insights");
-    }
 
     return data;
   } catch (error) {

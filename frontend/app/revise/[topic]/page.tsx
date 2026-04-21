@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { fetchQuestions, saveSession, submitRevisionFeedback } from "../../../lib/api";
+import {
+  fetchQuestions,
+  saveSession,
+  submitRevisionFeedback,
+} from "../../../lib/api";
 import { trackEvent } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +23,14 @@ export default function RevisePage() {
   const [questions, setQuestions] = useState<any>(null);
   const [revision_level, setRevisionLevel] = useState<number>(1);
   const [trend, setTrend] = useState("stable");
+  const [rewardMessage, setRewardMessage] = useState("");
+  const [showReward, setShowReward] = useState(false);
+
+  const messages = [
+    "Nice! That concept is getting stronger 🌟",
+    "Great job today — small steps matter 💛",
+    "You're helping your child build real understanding 👏",
+  ];
 
   useEffect(() => {
     if (!concept) return;
@@ -72,21 +84,6 @@ export default function RevisePage() {
     return <p className="text-center mt-10">Loading...</p>;
   }
 
-  const getScoreFromFeedback = (level: string) => {
-    switch (level) {
-      case "low":
-        return 30;
-      case "medium":
-        return 50;
-      case "high":
-        return 75;
-      case "very_high":
-        return 90;
-      default:
-        return 50;
-    }
-  };
-
   const handleRevisionFeedback = async () => {
     if (!engagement) return;
 
@@ -96,21 +93,23 @@ export default function RevisePage() {
     });
 
     try {
-      // await saveSession({
-      //   topic: concept,
-      //   // subject: currentSubject || "General",
-      //   // classLevel: currentClass,
-      //   subject: "General",
-      //   classLevel: 1,
-      //   engagement,
-      // });
       await submitRevisionFeedback({
         topic: concept,
         engagement: engagement,
         child_id: "c3658790-741b-4823-be25-0822ba4e72df", // TODO: get actual child ID
       });
-      // return result; // ✅ important
-      router.push("/dashboard");
+
+      // ✅ Only after successful save
+
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+      setRewardMessage(msg);
+      setShowReward(true);
+
+      // redirect after delay
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+      // router.push("/dashboard");
     } catch (error) {
       console.error("Error saving session:", error);
       throw error; // propagate to UI
@@ -143,21 +142,11 @@ export default function RevisePage() {
 
       <h1 className="text-2xl font-bold">Revise: {concept}</h1>
 
-      <p className="text-sm text-gray-500 mb-2">
-        Level {revision_level} Practice
-      </p>
-
-      <div className="w-full max-w-xl mx-auto mt-4 flex flex-col gap-4 text-left">
-        {questions?.questions?.map((q: string, i: number) => (
-          <div key={i} className="p-4 bg-white rounded-2xl shadow text-left">
-            <p className="text-gray-800 font-medium">
-              {i + 1}. {q}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {!questions && trend && (
+      {/* <p className="text-xs text-gray-500 text-center">
+        A quick check to see how well this is sticking
+      </p> */}
+      
+      {trend && (
         <div className="mt-6 text-center">
           {trend === "improving" && (
             <p className="text-green-600">
@@ -178,6 +167,20 @@ export default function RevisePage() {
           )}
         </div>
       )}
+
+      <p className="text-sm text-gray-500 mb-2">
+        Level {revision_level} Practice
+      </p>
+
+      <div className="w-full max-w-xl mx-auto mt-4 flex flex-col gap-4 text-left">
+        {questions?.questions?.map((q: string, i: number) => (
+          <div key={i} className="p-4 bg-white rounded-2xl shadow text-left">
+            <p className="text-gray-800 font-medium">
+              {i + 1}. {q}
+            </p>
+          </div>
+        ))}
+      </div>
 
       {questions && (
         <div className="mt-6 text-center">
@@ -208,9 +211,19 @@ export default function RevisePage() {
             className="mt-2 border px-4 py-2 rounded-xl"
             onClick={() => handleRevisionFeedback()}
           >
-            Submit
+            Save Progress
           </button>
         </>
+      )}
+
+      {showReward && (
+        <p className="text-center text-green-600 mt-4">{rewardMessage}</p>
+      )}
+
+      {showReward && (
+        <p className="text-center text-gray-500 mt-2">
+          Next: We’ll revisit this tomorrow to make it stick 🧠
+        </p>
       )}
     </main>
   );

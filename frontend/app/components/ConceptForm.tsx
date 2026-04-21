@@ -21,14 +21,32 @@ export default function ConceptForm({
       onSubmit={handleSubmit}
       className="flex flex-col gap-4 w-full max-w-md"
     >
-      <input
+      {/* <input
         type="text"
         placeholder="What would you like to teach today? (e.g., Fractions)"
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
         className="border p-3 rounded-lg"
         required
+      /> */}
+      <p className="text-lg font-medium text-center mb-2">
+        What would you like to teach today?
+      </p>
+
+      <input
+        type="text"
+        placeholder="Enter a topic"
+        value={topic}
+        onChange={(e) => setTopic(e.target.value)}
+        className="border p-3 rounded-lg"
+        required
       />
+
+      {!topic && (
+        <p className="text-xs text-gray-500 text-left">
+          e.g., Fractions • Simple Interest
+        </p>
+      )}
 
       <input
         type="text"
@@ -40,7 +58,7 @@ export default function ConceptForm({
       />
 
       <button className="bg-blue-600 text-white py-3 rounded-lg">
-        Generate Teaching
+        Start Teaching
       </button>
     </form>
   );

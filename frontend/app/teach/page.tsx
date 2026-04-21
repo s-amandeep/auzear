@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ConceptForm from "../components/ConceptForm";
 import TeachingCard from "./components/TeachingCard";
 import QuestionsCard from "./components/QuestionsCard";
@@ -35,6 +35,29 @@ export default function TeachPage() {
     error,
   } = useTeaching();
 
+  const loadingMessages = [
+    "Thinking of a simple way to explain...",
+    "Making this easy for your child...",
+    "Preparing something helpful...",
+  ];
+  const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
+
+  useEffect(() => {
+    if (!loading) return;
+
+    let index = 0;
+
+    const interval = setInterval(() => {
+      index = (index + 1) % loadingMessages.length;
+      setLoadingMessage(loadingMessages[index]);
+    }, 2000);
+
+    return () => clearInterval(interval); // 🔥 cleanup
+  }, [loading]);
+
+  // const msg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+  // setLoadingMessage(msg);
+
   const handleStart = async ({ topic, classLevel }: TeachingInput) => {
     trackEvent("teach_started", { topic });
     try {
@@ -66,8 +89,12 @@ export default function TeachPage() {
       await submitFeedback({ engagement });
       setSaving(false);
 
-      // ✅ Only after successful save
-      router.push("/dashboard");
+      // redirect after delay
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+
+      // router.push("/dashboard");
     } catch (error) {
       alert("Failed to save session");
     }
@@ -101,9 +128,15 @@ export default function TeachPage() {
 
       <ConceptForm onSubmit={handleStart} />
 
+      {!hasResult && (
+        <p className="text-xs text-gray-500 text-center mt-1">
+          We’ll guide you step by step — no prep needed
+        </p>
+      )}
+
       {/* {loading && <p>Generating...</p>} */}
       {hasStarted && !hasResult && (
-        <p className="mt-4 text-gray-500">Generating lesson...</p>
+        <p className="mt-4 text-gray-500">{loadingMessage}</p>
       )}
 
       {error && (
@@ -130,6 +163,10 @@ export default function TeachPage() {
           onDone={handleFinalSave}
         />
       )}
+
+      <p className="text-xs text-gray-400 text-center mt-10 mb-4">
+        You don’t need to be perfect — just consistent 💛
+      </p>
     </main>
   );
 }

@@ -7,27 +7,27 @@ export default function TodayRevisionCard({ items }: any) {
       return {
         bg: "bg-green-50",
         text: "text-green-700",
-        label: "Strong",
+        label: "Strong Understanding ⭐",
       };
     }
     if (status === "medium") {
       return {
         bg: "bg-yellow-50",
         text: "text-yellow-700",
-        label: "Needs Practice",
+        label: "Building Up 💪",
       };
     }
     return {
       bg: "bg-red-50",
       text: "text-red-700",
-      label: "Weak",
+      label: "Needs Support 🌱",
     };
   };
 
   const getStatus = (memory: number) => {
-    if (memory < 0.4) return "Needs Support 🌱";
-    if (memory < 0.7) return "Building Up 💪";
-    return "Strong Understanding ⭐";
+    if (memory < 0.4) return "low";
+    if (memory < 0.7) return "medium";
+    return "strong";
   };
 
   const handleRevise = (item: any) => {
@@ -46,13 +46,13 @@ export default function TodayRevisionCard({ items }: any) {
 
       <div className="w-full max-w-xl bg-black text-white rounded-2xl p-6">
         <div className="flex flex-col gap-3 mt-4">
-          {!items || items.length === 0 ? (
-            <button
-              className="bg-white text-black px-4 py-2 rounded-xl"
-              onClick={() => router.push("/teach")}
-            >
-              Teach Something New
-            </button>
+          {!items || items.length === 0 ? (          
+              <button
+                className="bg-white text-black px-4 py-2 rounded-xl"
+                onClick={() => router.push("/teach")}
+              >
+                Start with one topic today — it only takes a minute 🌱
+              </button>            
           ) : (
             items.map((item: any, index: number) => {
               const style = getStyles(getStatus(item.memory_strength));

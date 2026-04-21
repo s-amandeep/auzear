@@ -8,7 +8,7 @@ async function getLearningContext(child_id, topic) {
   }
   const normalizedTopic = topic.trim().toLowerCase();
 
-  console.log("Fetching learning context for:", {topic, child_id});
+  // console.log("Fetching learning context for:", {topic, child_id});
   // get concept
 
   const { data: concept } = await supabase
@@ -40,7 +40,7 @@ async function getLearningContext(child_id, topic) {
 
   const lastSession = sessions?.[0];
 
-  console.log("Learning context fetched:", {concept, state, lastSession});
+  // console.log("Learning context fetched:", {concept, state, lastSession});
   return {
     concept,
     state,
