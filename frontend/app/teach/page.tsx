@@ -11,17 +11,26 @@ import { useTeaching } from "../../hooks/useTeaching";
 import { TeachingInput, QuestionResponse } from "../types";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
+import { useSearchParams } from "next/navigation";
+import { fetchLastTeaching } from "@/lib/api";
 
 export default function TeachPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  // const [currentTopic, setCurrentTopic] = useState("");
   const [currentClass, setCurrentClass] = useState("");
   const [engagement, setEngagement] = useState<
     "low" | "medium" | "high" | "very_high" | ""
   >("");
   const [hasStarted, setHasStarted] = useState(false);
   const [hasResult, setHasResult] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  const revisitTopicParam = searchParams.get("topic");
+  const revisitTopic = revisitTopicParam ?? "";
+  const mode = searchParams.get("mode");
+  // const child_id = localStorage.getItem("child_id");
+  const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
   const {
     loading,
@@ -55,70 +64,94 @@ export default function TeachPage() {
     return () => clearInterval(interval); // 🔥 cleanup
   }, [loading]);
 
+  useEffect(() => {
+    if (mode === "revisit" && revisitTopic) {
+      loadLastTeaching();
+    }
+  }, [mode, revisitTopic]);
+
+  const loadLastTeaching = async () => {
+    try {
+      setHasStarted(true);
+      setHasResult(false);
+
+      if (!revisitTopic || !child_id) {
+        return;
+      }
+
+      const res = await fetchLastTeaching(revisitTopic, child_id);
+
+      if (res?.teaching) {
+        // 🔥 directly set hook state
+        setHasResult(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // const msg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
   // setLoadingMessage(msg);
 
   const handleStart = async ({ topic, classLevel }: TeachingInput) => {
     trackEvent("teach_started", { topic });
-    try {
-      setHasStarted(true);
-      setHasResult(false); // 🔥 reset before call
 
-      await startTeaching({ topic, classLevel });
+    setHasStarted(true);
+    setHasResult(false);
+
+    const res = await startTeaching({ topic, classLevel });
+
+    if (res) {
       setCurrentClass(classLevel);
-
-      // ✅ ONLY after success
       setHasResult(true);
-    } catch (error) {
-      console.error(error);
+    } else {
       setHasStarted(false);
-      setHasResult(false);
     }
   };
 
   const handleFinalSave = async () => {
-    trackEvent("done_clicked", { currentTopic });
-    try {
-      if (!engagement) {
-        alert("Please select how your child responded");
-        return;
-      }
+    if (!engagement) {
+      alert("Please select how your child responded");
+      return;
+    }
 
+    try {
       setSaving(true);
 
-      await submitFeedback({ engagement });
+      await submitFeedback({
+        engagement,
+        child_id,
+        teachResult: result, // 🔥 correct source
+      });
+
       setSaving(false);
 
-      // redirect after delay
       setTimeout(() => {
         router.push("/dashboard");
-      }, 1500);
-
-      // router.push("/dashboard");
+      }, 1000);
     } catch (error) {
       alert("Failed to save session");
     }
   };
 
   const handleImprove = async () => {
-    trackEvent("teach_started", { currentTopic, engagement });
     if (!currentTopic) return;
 
-    try {
-      setHasStarted(true);
-      setHasResult(false); // 🔥 reset before call
+    trackEvent("teach_improve_clicked", { currentTopic, engagement });
 
-      await startTeaching({
-        topic: currentTopic,
-        classLevel: currentClass,
-        ...(engagement && { engagement }), // 🔥 only difference
-      });
-      // ✅ ONLY after success
+    setHasStarted(true);
+    setHasResult(false);
+
+    const res = await startTeaching({
+      topic: currentTopic,
+      classLevel: currentClass,
+      ...(engagement && { engagement }),
+    });
+
+    if (res) {
       setHasResult(true);
-    } catch (error) {
-      console.error(error);
+    } else {
       setHasStarted(false);
-      setHasResult(false);
     }
   };
 
@@ -134,9 +167,10 @@ export default function TeachPage() {
         </p>
       )}
 
-      {/* {loading && <p>Generating...</p>} */}
       {hasStarted && !hasResult && (
-        <p className="mt-4 text-gray-500">{loadingMessage}</p>
+        <div className="mt-4 text-center">
+          <p className="text-gray-500">{loadingMessage}</p>
+        </div>
       )}
 
       {error && (

@@ -25,8 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">    
-
+    <html lang="en" className="light">
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
         strategy="afterInteractive"
@@ -41,16 +40,16 @@ export default function RootLayout({
           gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
         `}
       </Script>
-      <body>
-        <nav className="flex gap-4 p-4 bg-white shadow">
-          <Link href="/">Home</Link>
+      <body className="bg-gray-50">
+        {/* Navbar */}
+        <nav className="flex justify-center gap-6 p-4 border-b bg-white text-sm">
           <Link href="/teach">Teach</Link>
           <Link href="/dashboard">Dashboard</Link>
-          <Link href="/insights">Insights</Link>
-          <Link href="/plan">Plan</Link>
+          <Link href="/topics">Topics</Link>
         </nav>
 
-        {children}
+        {/* Page Content */}
+        <main>{children}</main>
       </body>
     </html>
   );

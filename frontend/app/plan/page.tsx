@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useRevision } from "../../hooks/useRevision";
 import UpcomingRevision from "./components/UpcomingRevision";
-import FocusCard from "./components/FocusCard";
-import WeeklyPlan from "./components/WeeklyPlan";
 import { trackEvent } from "@/lib/analytics";
 
 export default function Plan() {
-  const { startRevision, upcoming, suggestion, weeklyPlan } = useRevision();
+  const { startRevision, upcoming, loading } = useRevision();
 
   useEffect(() => {
     trackEvent("plan_clicked", {});
@@ -17,27 +14,47 @@ export default function Plan() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center p-6 gap-6">
+    <main className="flex flex-col items-center px-4 py-6 gap-6 max-w-xl mx-auto">
+      
       {/* Header */}
-      <div className="w-full max-w-xl">
-        <h1 className="text-2xl font-semibold">Learning Plan</h1>
-
-        <p className="text-sm text-gray-500">
-          A simple guide for upcoming days
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold">Upcoming Learning</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          What to revisit in the next few days
         </p>
       </div>
 
-      <h2 className="text-xl font-semibold">Coming up</h2>
+      {/* Loading */}
+      {loading && (
+        <p className="text-gray-500 text-sm">
+          Preparing your plan...
+        </p>
+      )}
 
-      <UpcomingRevision items={upcoming} />
+      {/* Content */}
+      {!loading && (
+        <>
+          <UpcomingRevision items={upcoming} />
 
-      <p className="text-sm text-gray-500">Suggested Focus</p>
+          {/* Empty state */}
+          {!upcoming?.length && (
+            <div className="text-center mt-4">
+              <p className="text-gray-500 text-sm">
+                You're all set for now 🎉
+              </p>
 
-      <FocusCard text={suggestion} />
+              <p className="text-xs text-gray-400 mt-1">
+                Teach a new topic to keep the momentum going
+              </p>
+            </div>
+          )}
 
-      <h2 className="text-xl font-semibold">Weekly Plan</h2>
-      
-      <WeeklyPlan items={weeklyPlan} />
-    </div>
+          {/* Emotional anchor */}
+          <p className="text-xs text-gray-400 text-center mt-4">
+            Learning works best when revisited at the right time 💛
+          </p>
+        </>
+      )}
+    </main>
   );
 }

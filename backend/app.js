@@ -11,7 +11,8 @@ const sessionRoutes = require("./routes/sessionRoutes");
 const revisionRoutes = require("./routes/revisionRoutes");
 const questionRoutes = require("./routes/questionRoutes");
 const insightRoutes = require("./routes/insightRoutes");
-const profileRoutes = require("./routes/profileRoutes");
+const topicRoutes = require("./routes/topicRoutes");
+const errorHandler = require("./middleware/errorHandler");
 
 app.use("/api", apiLimiter);
 // app.use(cors());
@@ -24,12 +25,19 @@ app.get("/", (req, res) => {
   res.send("Auzear API running");
 });
 
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 app.use("/api/teaching", teachingRoutes);
 app.use("/api/session", sessionRoutes);
 app.use("/api/revision", revisionRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/insights", insightRoutes);
-app.use("/api/profile", profileRoutes);
+app.use("/api/topics", topicRoutes);
+
+app.use(errorHandler); // 🔥 MUST be last
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

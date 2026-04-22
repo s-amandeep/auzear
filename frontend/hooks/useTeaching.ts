@@ -21,43 +21,61 @@ export function useTeaching() {
     engagement,
   }: TeachingInput) => {
     setLoading(true);
+    setError("");
 
-    const teaching = await fetchTeaching(topic, classLevel, engagement);
+    const storedChildId = localStorage.getItem("child_id");
+    // const storedChildId = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: replace with actual child_id
 
-    if (teaching?.error) {
-      setError(teaching.message);
+    if (!storedChildId) {
+      setError("Child not found. Please reload.");
       setLoading(false);
-      return;
+      return null;
     }
 
-    // console.log("Received teaching:", teaching);
-    setCurrentTopic(teaching.topic);
-    setCurrentSubject(teaching.subject);
-    setResult(teaching.teach);
-    setQuestions({ questions: teaching.questions });
-    setParentTip(teaching.parentTip || "");
-    setCurrentClass(classLevel);
-    setPrerequisite(teaching.prerequisite || null);
+    try {
+      const teaching = await fetchTeaching({
+        topic,
+        classLevel,
+        child_id: storedChildId, // 🔥 TEMP fix        
+        ...(engagement && { engagement }),
+      });
 
-    setLoading(false);
+      if (teaching?.error) {
+        setError(teaching.message);
+        setLoading(false);
+        return null;
+      }
 
-    return teaching;
+      setCurrentTopic(teaching.topic);
+      setCurrentSubject(teaching.subject);
+      setResult(teaching.teach);
+      setQuestions({ questions: teaching.questions });
+      setParentTip(teaching.parentTip || "");
+      setCurrentClass(classLevel);
+      setPrerequisite(teaching.prerequisite || null);
+
+      setLoading(false);
+
+      return teaching; // 🔥 IMPORTANT
+    } catch (err) {
+      setError("Something went wrong");
+      setLoading(false);
+      return null;
+    }
   };
 
-  const submitFeedback = async ({ engagement }: FeedbackInput) => {
-    try {
-      const result = await saveSession({  
-        topic: currentTopic,
-        subject: currentSubject || "General",
-        classLevel: currentClass,
-        // score,
-        engagement,
-      });
-      return result; // ✅ important
-    } catch (error) {
-      console.error("Error saving session:", error);
-      throw error; // propagate to UI
-    }
+  const submitFeedback = async ({
+    engagement,
+    child_id,
+    teachResult,
+  }: FeedbackInput) => {
+    return await saveSession({
+      topic: currentTopic,
+      subject: currentSubject || "General",
+      child_id,
+      engagement,
+      teachResult,
+    });
   };
 
   return {

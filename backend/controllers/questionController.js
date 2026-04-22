@@ -1,35 +1,34 @@
-const { generateFromPrompt } = require("../services/aiService");
-const { getQuestionPrompt } = require("../prompts/questionPrompt");
-const { getLearningContext } = require("../utils/getLearningContext");
+const { generateQuestionsService } = require("../services/questionService");
 
 async function generateQuestions(req, res) {
-  const { topic, classLevel, childId } = req.body;
-
-  console.log("AI CALL:", {
-    endpoint: "revision-questions",
-    topic: topic,
-    time: new Date(),
-    childId: childId,
-  });
+  const { topic, classLevel, child_id } = req.body;
 
   try {
-    // 🔥 fetch past context
-    const context = await getLearningContext(childId, topic);
-    const revision_level = context?.state?.revision_level || 1;
-    const prompt = getQuestionPrompt(topic, classLevel, revision_level);
-
-    const raw = await generateFromPrompt(prompt);
-
-    let parsed;
-
-    try {
-      parsed = JSON.parse(raw);
-    } catch (e) {
-      return res.status(500).json({ error: "Failed to generate questions" });
+    if (!topic || topic.length > 100) {
+      return res.status(400).json({ error: "Invalid topic input" });
     }
 
-    res.json({ data: parsed, revision_level: revision_level, trend: context?.state?.trend || "stable" });
+    console.log("AI CALL:", {
+      endpoint: "revision-questions",
+      topic,
+      time: new Date(),
+      child_id,
+    });
+
+    const result = await generateQuestionsService({
+      topic,
+      classLevel,
+      child_id,
+    });
+
+    res.json({
+      data: result.questions,
+      revision_level: result.revision_level,
+      trend: result.trend,
+    });
+
   } catch (err) {
+    console.error("Question Error:", err.message);
     res.status(500).json({ error: err.message });
   }
 }

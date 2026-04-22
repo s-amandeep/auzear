@@ -73,9 +73,3 @@ Return ONLY JSON:
 }
 
 module.exports = { getTeachingPrompt };
-
-// 3. Create a teaching script (teach field):
-//    - What the parent should SAY
-//    - Simple explanation in conversational tone
-//    - Include one analogy
-//    - Include one real-life example

@@ -5,13 +5,39 @@ const client = new OpenAI({
 });
 
 async function generateFromPrompt(prompt) {
-  const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    max_tokens: 500, // 🔥 ADD HERE    
-  });
+  try {
+    // ⏱️ Timeout wrapper (10 sec)
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("AI request timeout")), 10000)
+    );
 
-  return response.choices[0].message.content;
+    const aiPromise = client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 400, // 🔥 slightly reduced to control cost
+      temperature: 0.7, // balanced creativity + consistency
+    });
+
+    const response = await Promise.race([aiPromise, timeoutPromise]);
+
+    const content = response?.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error("Empty AI response");
+    }
+
+    return content;
+
+  } catch (err) {
+    console.error("AI SERVICE ERROR:", err.message);
+
+    // 🔥 Normalize error messages (important for frontend stability)
+    if (err.message.includes("timeout")) {
+      throw new Error("AI request timeout");
+    }
+
+    throw new Error("AI generation failed");
+  }
 }
 
 module.exports = { generateFromPrompt };

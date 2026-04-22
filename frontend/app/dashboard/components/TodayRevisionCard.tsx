@@ -35,6 +35,12 @@ export default function TodayRevisionCard({ items }: any) {
     router.push(`/revise/${encodeURIComponent(item.conceptName)}`);
   };
 
+  const handleRevisit = (item: any) => {
+    router.push(
+      `/teach?topic=${encodeURIComponent(item.conceptName)}&mode=revisit`,
+    );
+  };
+
   return (
     <div className="w-full max-w-xl mx-auto bg-black text-white rounded-2xl p-4 sm:p-6">
       <p className="text-base sm:text-lg font-semibold text-center sm:text-left">
@@ -96,6 +102,12 @@ export default function TodayRevisionCard({ items }: any) {
                     onClick={() => handleRevise(item)}
                   >
                     Practice
+                  </button>
+                  <button
+                    className="text-xs text-gray-600 underline mt-2"
+                    onClick={() => handleRevisit(item)}
+                  >
+                    Revisit Last Session
                   </button>
                 </div>
               </div>

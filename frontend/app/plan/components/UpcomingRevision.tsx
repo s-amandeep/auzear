@@ -36,6 +36,12 @@ export default function UpcomingRevision({ items }: any) {
     router.push(`/revise/${encodeURIComponent(item.conceptName)}`);
   };
 
+  const handleRevisit = (item: any) => {
+    router.push(
+      `/teach?topic=${encodeURIComponent(item.conceptName)}&mode=revisit`,
+    );
+  };
+
   return (
     <div className="flex max-w-xl flex-col items-center gap-4 w-full">
       {!items || items.length === 0 ? (
@@ -90,6 +96,12 @@ export default function UpcomingRevision({ items }: any) {
                   onClick={() => handleRevise(item)}
                 >
                   Practice
+                </button>
+                <button
+                  className="text-xs text-gray-600 underline mt-2"
+                  onClick={() => handleRevisit(item)}
+                >
+                  Revisit Last Session
                 </button>
               </div>
             </div>

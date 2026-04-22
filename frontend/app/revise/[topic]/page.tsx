@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   fetchQuestions,
-  saveSession,
   submitRevisionFeedback,
 } from "../../../lib/api";
 import { trackEvent } from "@/lib/analytics";
@@ -25,6 +24,8 @@ export default function RevisePage() {
   const [trend, setTrend] = useState("stable");
   const [rewardMessage, setRewardMessage] = useState("");
   const [showReward, setShowReward] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const messages = [
     "Nice! That concept is getting stronger 🌟",
@@ -39,17 +40,35 @@ export default function RevisePage() {
 
   const loadQuestions = async () => {
     trackEvent("revise_clicked", { topic: concept });
+
     try {
-      const res = await fetchQuestions(
-        concept,
-        "3",
-        "c3658790-741b-4823-be25-0822ba4e72df",
-      );
-      setQuestions(res?.data || []);
-      setRevisionLevel(res?.revision_level || 1);
-      setTrend(res?.trend || "stable");
+      const child_id = localStorage.getItem("child_id");
+
+      if (!child_id) return;
+
+      setLoading(true);
+
+      const res = await fetchQuestions({
+        topic: concept,
+        classLevel: "3",
+        child_id,
+      });
+
+      if ("error" in res) {
+        setError(res.message);
+        setLoading(false);
+        return;
+      }
+
+      setQuestions(res.data || []);
+      setRevisionLevel(res.revision_level || 1);
+      setTrend(res.trend || "stable");
+
+      setLoading(false);
     } catch (err) {
       console.error("Failed to load questions");
+      setError("Something went wrong");
+      setLoading(false);
     }
   };
 
@@ -92,11 +111,15 @@ export default function RevisePage() {
       engagement: engagement,
     });
 
+    const child_id = localStorage.getItem("child_id");
+
+    if (!child_id) return;
+
     try {
       await submitRevisionFeedback({
         topic: concept,
         engagement: engagement,
-        child_id: "c3658790-741b-4823-be25-0822ba4e72df", // TODO: get actual child ID
+        child_id: child_id, // TODO: get actual child ID
       });
 
       // ✅ Only after successful save
@@ -108,8 +131,7 @@ export default function RevisePage() {
       // redirect after delay
       setTimeout(() => {
         router.push("/dashboard");
-      }, 1500);
-      // router.push("/dashboard");
+      }, 1500);      
     } catch (error) {
       console.error("Error saving session:", error);
       throw error; // propagate to UI
@@ -117,49 +139,23 @@ export default function RevisePage() {
   };
 
   return (
-    <main className="p-6 flex flex-col items-center gap-6">
-      {/* {trend && (
-        <div className="mt-6 text-center">
-          {trend === "improving" && (
-            <p className="text-green-600">
-              Great! Your child is progressing well 🚀
-            </p>
-          )}
+    <main className="p-6 flex flex-col items-center gap-6 max-w-xl mx-auto">
+      {/* Title */}
+      <h1 className="text-2xl font-bold text-center">Revise: {concept}</h1>
 
-          {trend === "stable" && (
-            <p className="text-gray-600">
-              Good progress! Let’s strengthen this further 💪
-            </p>
-          )}
-
-          {trend === "declining" && (
-            <p className="text-red-500">
-              Let’s revisit basics to build confidence 🌱
-            </p>
-          )}
-        </div>
-      )} */}
-
-      <h1 className="text-2xl font-bold">Revise: {concept}</h1>
-
-      {/* <p className="text-xs text-gray-500 text-center">
-        A quick check to see how well this is sticking
-      </p> */}
-      
+      {/* Trend Message */}
       {trend && (
-        <div className="mt-6 text-center">
+        <div className="text-center">
           {trend === "improving" && (
             <p className="text-green-600">
               Great! Your child is progressing well 🚀
             </p>
           )}
-
           {trend === "stable" && (
             <p className="text-gray-600">
               Good progress! Let’s strengthen this further 💪
             </p>
           )}
-
           {trend === "declining" && (
             <p className="text-red-500">
               Let’s revisit basics to build confidence 🌱
@@ -168,32 +164,39 @@ export default function RevisePage() {
         </div>
       )}
 
-      <p className="text-sm text-gray-500 mb-2">
-        Level {revision_level} Practice
-      </p>
+      {/* Level */}
+      <p className="text-sm text-gray-500">Level {revision_level} Practice</p>
 
-      <div className="w-full max-w-xl mx-auto mt-4 flex flex-col gap-4 text-left">
-        {questions?.questions?.map((q: string, i: number) => (
-          <div key={i} className="p-4 bg-white rounded-2xl shadow text-left">
-            <p className="text-gray-800 font-medium">
-              {i + 1}. {q}
-            </p>
-          </div>
-        ))}
-      </div>
+      {/* Loading */}
+      {loading && <p className="text-gray-500">Preparing questions...</p>}
 
-      {questions && (
+      {/* Error */}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {/* Questions */}
+      {!loading && questions?.questions && (
+        <div className="w-full flex flex-col gap-4">
+          {questions.questions.map((q: string, i: number) => (
+            <div key={i} className="p-4 bg-white rounded-2xl shadow">
+              <p className="text-gray-800 font-medium text-left">
+                {i + 1}. {q}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Feedback */}
+      {!loading && questions && (
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 mb-3">
-            How did your child perform?
-          </p>
+          <p className="text-sm text-gray-600 mb-3">How did your child do?</p>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2 justify-center flex-wrap">
             {options.map((item) => (
               <button
                 key={item.value}
                 className={`flex flex-col items-center px-3 py-2 rounded-lg border ${
-                  engagement === item.value ? "bg-black text-white" : ""
+                  engagement === item.value ? "bg-black text-white" : "bg-white"
                 }`}
                 onClick={() => setEngagement(item.value)}
               >
@@ -205,25 +208,24 @@ export default function RevisePage() {
         </div>
       )}
 
+      {/* Save Button */}
       {engagement && (
-        <>
-          <button
-            className="mt-2 border px-4 py-2 rounded-xl"
-            onClick={() => handleRevisionFeedback()}
-          >
-            Save Progress
-          </button>
-        </>
+        <button
+          className="mt-4 bg-black text-white px-5 py-2 rounded-xl"
+          onClick={handleRevisionFeedback}
+        >
+          Save Progress
+        </button>
       )}
 
+      {/* Reward */}
       {showReward && (
-        <p className="text-center text-green-600 mt-4">{rewardMessage}</p>
-      )}
-
-      {showReward && (
-        <p className="text-center text-gray-500 mt-2">
-          Next: We’ll revisit this tomorrow to make it stick 🧠
-        </p>
+        <div className="text-center mt-4">
+          <p className="text-green-600">{rewardMessage}</p>
+          <p className="text-gray-500 text-sm mt-1">
+            We’ll revisit this soon to make it stick 🧠
+          </p>
+        </div>
       )}
     </main>
   );

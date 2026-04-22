@@ -14,6 +14,8 @@ export type FeedbackInput = {
   // classLevel: string;
   // score: number;
   engagement: "low" | "medium" | "high" | "very_high";
+  child_id: string; // ✅ add child ID to feedback
+  teachResult: string; // ✅ add result to feedback
 };
 
 export type SubjectStat = {

@@ -1,17 +1,13 @@
-const { generateFromPrompt } = require("../services/aiService");
-const { getTeachingPrompt } = require("../prompts/teachingPrompt");
-const { getLearningContext } = require("../utils/getLearningContext");
-const { raw } = require("express");
+const { generateTeachingService, getLastTeachingService } = require("../services/teachingService");
 
 async function generateTeaching(req, res) {
   const { topic, classLevel, child_id, engagement } = req.body;
 
   try {
+    // 1. Validation
     if (!topic || topic.length > 100) {
       return res.status(400).json({ error: "Invalid topic input" });
     }
-
-    const normalizedTopic = topic.trim().toLowerCase();
 
     console.log("AI CALL:", {
       endpoint: "teach",
@@ -19,40 +15,34 @@ async function generateTeaching(req, res) {
       time: new Date(),
     });
 
-    let parsed;
-
-    try {
-      // 🔥 fetch past context
-      const context = await getLearningContext(child_id, topic);
-      // console.log("context" , context);
-      const prompt = getTeachingPrompt(
-        normalizedTopic,
-        classLevel,
-        context,
-        engagement,
-      );
-      // console.log("prompt" , prompt);
-      const raw = await generateFromPrompt(prompt);
-
-      parsed = JSON.parse(raw);
-    } catch (e) {
-      return res.status(500).json({ error: "Invalid AI response" });
-    }
-
-    // console.log(raw);
-
-    res.json({
-      topic: parsed.topic,
-      subject: parsed.subject,
-      teach: parsed.teach,
-      questions: parsed.practice,
-      parentTip: parsed.parent_tip,
-      prerequisite: parsed.prerequisite || null,
+    // 2. Call service
+    const result = await generateTeachingService({
+      topic,
+      classLevel,
+      child_id,
+      engagement,
     });
-    // res.json(parsed);
+
+    // 3. Send response
+    res.json(result);
   } catch (err) {
+    console.error("Teaching Error:", err.message);
     res.status(500).json({ error: err.message });
   }
 }
 
-module.exports = { generateTeaching };
+async function getLastTeaching(req, res) {
+  try {
+    const { topic, child_id } = req.query;
+
+    const teaching = await getLastTeachingService(topic, child_id);
+
+    res.json({ teaching });
+
+  } catch (err) {
+    console.error("Fetch last teaching error:", err);
+    res.status(500).json({ error: "Failed to fetch teaching" });
+  }
+}
+
+module.exports = { generateTeaching, getLastTeaching };
