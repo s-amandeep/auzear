@@ -189,7 +189,13 @@ export default function TeachPage() {
 
   const teachingContent = isRevisit ? revisitData?.teach : result;
 
-  if (mode === null) return null;
+  if (mode === "revisit" && revisitTopic === "") {
+    return (
+      <p className="text-gray-500 text-center mt-10">
+        Invalid topic. Please try again.
+      </p>
+    );
+  }
 
   return (
     <main className="flex flex-col items-center p-6 gap-6">
