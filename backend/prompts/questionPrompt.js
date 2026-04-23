@@ -13,6 +13,30 @@ Your goal is to:
 
 ---
 
+Teaching Style Guidelines (VERY IMPORTANT):
+
+- Class 1–4:
+  - Very simple questions
+  - Use real-life or familiar examples
+  - Focus on basic understanding
+
+- Class 5–7:
+  - Slightly more structured questions
+  - Include simple reasoning
+  - Encourage thinking, not just recall
+
+- Class 8–9:
+  - Concept-based questions
+  - Require reasoning or application
+  - Avoid overly childish or trivial questions
+
+Important:
+- Always match BOTH class level AND revision level
+- Do NOT oversimplify for higher classes
+- Do NOT make questions too difficult for lower classes
+
+---
+
 Question Guidelines:
 
 Level 1 (Very Basic):
@@ -41,16 +65,20 @@ Level 5 (Real-life Thinking):
 Instructions:
 
 - Generate EXACTLY 3 questions
-- Questions must match the child's current level (${revision_level})
-- Keep language simple and friendly
+- Questions must match BOTH:
+  - revision level (${revision_level})
+  - class level (Class ${classLevel})
+
+- Keep language clear and friendly
 - No MCQs
 - No long explanations
 - No repetition
 - Make it feel like a real teacher asking
--- Follow this structure while generating questions:
-    - Question 1: easiest
-    - Question 2: moderate
-    - Question 3: slightly challenging (within level)
+
+- Structure:
+  - Question 1: easiest
+  - Question 2: moderate
+  - Question 3: slightly challenging (within the same level)
 
 ---
 
