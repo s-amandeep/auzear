@@ -13,7 +13,7 @@ import { useTeaching } from "../../hooks/useTeaching";
 import { TeachingInput, QuestionResponse } from "../types";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import { fetchLastTeaching } from "@/lib/api";
 
 export default function TeachPage() {
@@ -26,20 +26,22 @@ export default function TeachPage() {
   const [hasStarted, setHasStarted] = useState(false);
   const [hasResult, setHasResult] = useState(false);
 
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
 
   const [mode, setMode] = useState<string | null>(null);
   const [revisitTopic, setRevisitTopic] = useState("");
 
   useEffect(() => {
-    if (!searchParams) return;
+    if (typeof window === "undefined") return;
 
-    const m = searchParams.get("mode");
-    const topic = searchParams.get("topic");
+    const params = new URLSearchParams(window.location.search);
+
+    const m = params.get("mode");
+    const topic = params.get("topic");
 
     setMode(m);
     setRevisitTopic(topic || "");
-  }, [searchParams]);
+  }, []);
 
   // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
   const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
