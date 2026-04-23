@@ -5,11 +5,18 @@ import { TeachingInput } from "../types";
 
 export default function ConceptForm({
   onSubmit,
+  loading,
 }: {
   onSubmit: (data: TeachingInput) => void;
+  loading?: boolean;
 }) {
   const [topic, setTopic] = useState("");
-  const [classLevel, setClassLevel] = useState("3");
+  const [classLevel, setClassLevel] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("classLevel") || "3";
+    }
+    return "3";
+  });
   const [touched, setTouched] = useState(false);
 
   const handleSubmit = (e: any) => {
@@ -54,16 +61,17 @@ export default function ConceptForm({
 
         {/* Validation */}
         {touched && !topic.trim() && (
-          <p className="text-xs text-red-500">
-            Please enter a topic
-          </p>
+          <p className="text-xs text-red-500">Please enter a topic</p>
         )}
       </div>
 
       {/* Class Selector */}
       <select
         value={classLevel}
-        onChange={(e) => setClassLevel(e.target.value)}
+        onChange={(e) => {
+          setClassLevel(e.target.value);
+          localStorage.setItem("classLevel", e.target.value);
+        }}
         className="p-3 border rounded-xl"
       >
         <option value="1">Class 1</option>
@@ -74,8 +82,8 @@ export default function ConceptForm({
       </select>
 
       {/* CTA */}
-      <button className="bg-black text-white py-3 rounded-xl">
-        Start Teaching
+      <button className="bg-black text-white py-3 rounded-xl" disabled={loading}>
+        {loading ? "Starting..." : "Start Teaching"}
       </button>
 
       {/* Subtle reassurance */}

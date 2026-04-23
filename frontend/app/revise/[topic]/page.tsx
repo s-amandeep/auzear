@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import {
-  fetchQuestions,
-  submitRevisionFeedback,
-} from "../../../lib/api";
+import { fetchQuestions, submitRevisionFeedback } from "../../../lib/api";
 import { trackEvent } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 
@@ -26,6 +23,7 @@ export default function RevisePage() {
   const [showReward, setShowReward] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const messages = [
     "Nice! That concept is getting stronger 🌟",
@@ -42,7 +40,8 @@ export default function RevisePage() {
     trackEvent("revise_clicked", { topic: concept });
 
     try {
-      const child_id = localStorage.getItem("child_id");
+      // const child_id = localStorage.getItem("child_id");
+      const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
       if (!child_id) return;
 
@@ -111,7 +110,8 @@ export default function RevisePage() {
       engagement: engagement,
     });
 
-    const child_id = localStorage.getItem("child_id");
+    // const child_id = localStorage.getItem("child_id");
+    const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
     if (!child_id) return;
 
@@ -131,7 +131,7 @@ export default function RevisePage() {
       // redirect after delay
       setTimeout(() => {
         router.push("/dashboard");
-      }, 1500);      
+      }, 2000);
     } catch (error) {
       console.error("Error saving session:", error);
       throw error; // propagate to UI
@@ -172,6 +172,16 @@ export default function RevisePage() {
 
       {/* Error */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {/* Reward */}
+      {showReward && (
+        <div className="text-center mt-4">
+          <p className="text-green-600">{rewardMessage}</p>
+          <p className="text-gray-500 text-sm mt-1">
+            We’ll revisit this soon to make it stick 🧠
+          </p>
+        </div>
+      )}
 
       {/* Questions */}
       {!loading && questions?.questions && (
@@ -216,16 +226,6 @@ export default function RevisePage() {
         >
           Save Progress
         </button>
-      )}
-
-      {/* Reward */}
-      {showReward && (
-        <div className="text-center mt-4">
-          <p className="text-green-600">{rewardMessage}</p>
-          <p className="text-gray-500 text-sm mt-1">
-            We’ll revisit this soon to make it stick 🧠
-          </p>
-        </div>
       )}
     </main>
   );

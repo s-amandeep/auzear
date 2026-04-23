@@ -20,7 +20,7 @@ async function apiFetch<T = any>(
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 30000);
 
   try {
     const res = await fetch(`${API_URL}${url}`, {

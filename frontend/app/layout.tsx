@@ -43,6 +43,7 @@ export default function RootLayout({
       <body className="bg-gray-50">
         {/* Navbar */}
         <nav className="flex justify-center gap-6 p-4 border-b bg-white text-sm">
+          <Link href="/">Home</Link>
           <Link href="/teach">Teach</Link>
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/topics">Topics</Link>

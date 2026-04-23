@@ -11,39 +11,39 @@ export function useRevision() {
   const [suggestion, setSuggestion] = useState<string>("");
 
   const startRevision = async () => {
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const child_id = localStorage.getItem("child_id");
+    try {
+      // const child_id = localStorage.getItem("child_id");
+      const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
-    if (!child_id) {
+      if (!child_id) {
+        setLoading(false);
+        return;
+      }
+
+      const data = await fetchRevision(child_id);
+
+      if (data?.error) {
+        setLoading(false);
+        return;
+      }
+
+      setRevisionList(data.dueToday || []);
+      setUpcoming(data.upcoming || []);
+      setRetentionScore(data.retentionScore || 0);
+
+      // keep only what you actually use for now
+      setSuggestion(data.suggestion || "");
+
       setLoading(false);
-      return;
-    }
 
-    const data = await fetchRevision(child_id);
-
-    if (data?.error) {
+      return data;
+    } catch (err) {
+      console.error("Revision error:", err);
       setLoading(false);
-      return;
     }
-
-    setRevisionList(data.dueToday || []);
-    setUpcoming(data.upcoming || []);
-    setRetentionScore(data.retentionScore || 0);
-
-    // keep only what you actually use for now
-    setSuggestion(data.suggestion || "");
-
-    setLoading(false);
-
-    return data;
-
-  } catch (err) {
-    console.error("Revision error:", err);
-    setLoading(false);
-  }
-};
+  };
 
   return {
     loading,

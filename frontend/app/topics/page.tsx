@@ -14,7 +14,9 @@ export default function Topics() {
   }, []);
 
   const loadTopics = async () => {
-    const child_id = localStorage.getItem("child_id");
+    // const child_id = localStorage.getItem("child_id");
+    const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
+    
     if (!child_id) return;
 
     setLoading(true);
@@ -30,7 +32,6 @@ export default function Topics() {
 
   return (
     <main className="flex flex-col items-center px-4 py-6 gap-6 max-w-xl mx-auto">
-      
       <h1 className="text-2xl font-semibold">Topics Covered</h1>
 
       {loading && <p className="text-gray-500">Loading...</p>}
@@ -46,9 +47,7 @@ export default function Topics() {
           <div
             key={i}
             className="p-4 bg-white rounded-xl shadow cursor-pointer"
-            onClick={() =>
-              router.push(`/teach?topic=${t.topic}&mode=revisit`)
-            }
+            onClick={() => router.push(`/teach?topic=${t.topic}&mode=revisit`)}
           >
             <p className="font-semibold">{t.topic}</p>
             <p className="text-xs text-gray-500">

@@ -23,8 +23,8 @@ export function useTeaching() {
     setLoading(true);
     setError("");
 
-    const storedChildId = localStorage.getItem("child_id");
-    // const storedChildId = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: replace with actual child_id
+    // const storedChildId = localStorage.getItem("child_id");    
+    const storedChildId = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: replace with actual child_id
 
     if (!storedChildId) {
       setError("Child not found. Please reload.");

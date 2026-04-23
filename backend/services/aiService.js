@@ -8,7 +8,7 @@ async function generateFromPrompt(prompt) {
   try {
     // ⏱️ Timeout wrapper (10 sec)
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("AI request timeout")), 10000)
+      setTimeout(() => reject(new Error("AI request timeout")), 30000)
     );
 
     const aiPromise = client.chat.completions.create({

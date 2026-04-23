@@ -50,8 +50,6 @@ async function saveSessionService({
     .eq("concept_id", concept_id)
     .maybeSingle();
 
-  const currentScore = getScoreFromEngagement(engagement);
-
   const prevScore = existingState?.understanding_score || 0;
   const prevLevel = existingState?.revision_level || 1;
   const prevMemory = existingState?.memory_strength || 0.3;

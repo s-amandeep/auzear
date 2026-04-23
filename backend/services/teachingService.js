@@ -25,6 +25,7 @@ async function generateTeachingService({
 
   // 3. Call AI
   const raw = await generateFromPrompt(prompt);
+  // console.log(raw);
 
   // 4. Safe parse
   let parsed;
