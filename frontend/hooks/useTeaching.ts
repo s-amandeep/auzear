@@ -23,7 +23,7 @@ export function useTeaching() {
     setLoading(true);
     setError("");
 
-    // const storedChildId = localStorage.getItem("child_id");    
+    // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
     const storedChildId = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: replace with actual child_id
 
     if (!storedChildId) {

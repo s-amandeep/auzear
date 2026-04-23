@@ -40,7 +40,7 @@ export default function RevisePage() {
     trackEvent("revise_clicked", { topic: concept });
 
     try {
-      // const child_id = localStorage.getItem("child_id");
+      // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
       const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
       if (!child_id) return;
@@ -110,7 +110,7 @@ export default function RevisePage() {
       engagement: engagement,
     });
 
-    // const child_id = localStorage.getItem("child_id");
+    // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
     const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
     if (!child_id) return;

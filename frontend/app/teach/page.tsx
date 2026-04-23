@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from "react";
 import ConceptForm from "../components/ConceptForm";
 import TeachingCard from "./components/TeachingCard";
@@ -29,7 +31,7 @@ export default function TeachPage() {
   const revisitTopicParam = searchParams.get("topic");
   const revisitTopic = revisitTopicParam ?? "";
   const mode = searchParams.get("mode");
-  // const child_id = localStorage.getItem("child_id");
+  // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
   const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
   const [revisitData, setRevisitData] = useState<any>(null);
