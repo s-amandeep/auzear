@@ -28,9 +28,19 @@ export default function TeachPage() {
 
   const searchParams = useSearchParams();
 
-  const revisitTopicParam = searchParams.get("topic");
-  const revisitTopic = revisitTopicParam ?? "";
-  const mode = searchParams.get("mode");
+  const [mode, setMode] = useState<string | null>(null);
+  const [revisitTopic, setRevisitTopic] = useState("");
+
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const m = searchParams.get("mode");
+    const topic = searchParams.get("topic");
+
+    setMode(m);
+    setRevisitTopic(topic || "");
+  }, [searchParams]);
+
   // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
   const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
@@ -71,10 +81,12 @@ export default function TeachPage() {
   }, [loading]);
 
   useEffect(() => {
+    if (!child_id) return;
+
     if (mode === "revisit" && revisitTopic) {
       loadLastTeaching();
     }
-  }, [mode, revisitTopic]);
+  }, [mode, revisitTopic, child_id]);
 
   const loadLastTeaching = async () => {
     try {
@@ -85,7 +97,7 @@ export default function TeachPage() {
 
       const res = await fetchLastTeaching(revisitTopic, child_id);
 
-      if ("error" in res || !res.teaching) {
+      if (!res || (res as any).error || !res.teaching) {
         setHasStarted(false);
         return;
       }
@@ -174,6 +186,8 @@ export default function TeachPage() {
   };
 
   const teachingContent = isRevisit ? revisitData?.teach : result;
+
+  if (mode === null) return null;
 
   return (
     <main className="flex flex-col items-center p-6 gap-6">
