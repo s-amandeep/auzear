@@ -7,10 +7,19 @@ import TeachingCard from "../components/TeachingCard";
 import QuestionsCard from "../components/QuestionsCard";
 import ParentTip from "../components/ParentTip";
 import PrerequisiteCard from "../components/PrerequisiteCard";
+import FeedbackPanel from "../components/FeedbackPanel";
+import { saveSessionV2 } from "@/lib/api";
 
 export default function TeachRevisit() {
   const router = useRouter();
   const params = useParams();
+
+  const [engagement, setEngagement] = useState<
+    "low" | "medium" | "high" | "very_high" | ""
+  >("");
+
+  const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const concept_id =
     typeof params.concept_id === "string"
@@ -64,6 +73,52 @@ export default function TeachRevisit() {
     );
   }
 
+  // const handleSave = async () => {
+  //   if (!engagement) {
+  //     alert("Please select how your child responded");
+  //     return;
+  //   }
+
+  //   try {
+  //     setSaving(true);
+
+  //     const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // TODO dynamic later
+
+  //     let score = 60;
+
+  //     if (engagement === "low") score = 30;
+  //     else if (engagement === "medium") score = 60;
+  //     else if (engagement === "high") score = 80;
+  //     else if (engagement === "very_high") score = 95;
+
+  //     await saveSessionV2({
+  //       child_id,
+  //       concept_id,
+  //       understanding_score: score,
+  //       teaching_mode: data.teaching_mode,
+
+  //       teachResult: {
+  //         teach: data.teach,
+  //         questions: data.practice,
+  //         parentTip: data.parent_tip,
+  //         prerequisite: data.prerequisite,
+  //       },
+  //     });
+
+  //     setShowSuccess(true);
+  //     setSaving(false);
+
+  //     // Optional redirect
+  //     setTimeout(() => {
+  //       router.push("/dashboard");
+  //     }, 1500);
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Failed to save session");
+  //     setSaving(false);
+  //   }
+  // };
+
   return (
     <main className="flex flex-col items-center p-6 gap-6">
       {/* Header */}
@@ -88,6 +143,18 @@ export default function TeachRevisit() {
 
       {/* Questions */}
       <QuestionsCard questions={data.practice} />
+
+      {/* <FeedbackPanel
+        engagement={engagement}
+        setEngagement={setEngagement}
+        onDone={handleSave}
+      /> */}
+
+      {showSuccess && (
+        <p className="text-green-600 text-sm text-center mt-3">
+          Great! Understanding updated 🌱
+        </p>
+      )}
 
       {/* Next Step (VERY IMPORTANT) */}
       {data.next_step && (

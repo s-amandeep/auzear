@@ -198,49 +198,77 @@ export async function fetchTeachingV2({
 // ==========================
 // 🔥 V2: Save Session
 // ==========================
-export async function saveSessionV2({
-  topic,
-  subject,
-  classLevel,
-  child_id,
-  teaching_mode,
-  understanding_score,
-  teach,
-  practice,
-  parent_tip,
-  prerequisite,
-}: {
-  topic: string;
-  subject: string;
-  classLevel: number;
-  child_id: string;
-  teaching_mode: "foundational" | "intermediate" | "advanced";
-  understanding_score: number;
-  teach: any;
-  practice: any;
-  parent_tip: string;
-  prerequisite: any;
-}) {
-  return apiFetch("/api/v2/session", {
-    method: "POST",
-    body: JSON.stringify({
-      topic,
-      subject,
-      classLevel,
-      child_id,
-      teaching_mode,
-      understanding_score,
-      teach,
-      practice,
-      parent_tip,
-      prerequisite,
-    }),
-  });
-}
+
+type SaveSessionV2Input =
+  | {
+      // 🟢 NEW TEACH FLOW
+      topic: string;
+      subject: string;
+      classLevel: number;
+      child_id: string;
+      teaching_mode: "foundational" | "intermediate" | "advanced";
+      understanding_score: number;
+      teach: string;
+      practice: string[];
+      parent_tip: string;
+      prerequisite: any;
+      concept_id?: never;
+    }
+  | {
+      // 🔵 REVISIT FLOW
+      concept_id: string;
+      child_id: string;
+      teaching_mode: "foundational" | "intermediate" | "advanced";
+      understanding_score: number;
+      teach: string;
+      practice: string[];
+      parent_tip: string;
+      prerequisite: any;
+      topic?: never;
+      subject?: never;
+      classLevel?: never;
+    };
+
+// export async function saveSessionV2({
+//   topic,
+//   subject,
+//   classLevel,
+//   child_id,
+//   teaching_mode,
+//   understanding_score,
+//   teach,
+//   practice,
+//   parent_tip,
+//   prerequisite,
+// }: SaveSessionV2Input) {
+//   return apiFetch("/api/v2/session", {
+//     method: "POST",
+//     body: JSON.stringify({
+//       topic,
+//       subject,
+//       classLevel,
+//       child_id,
+//       teaching_mode,
+//       understanding_score,
+//       teach,
+//       practice,
+//       parent_tip,
+//       prerequisite,
+//     }),
+//   });
+// }
 
 // ==========================
 // 🔥 V2: Fetch Topics (New Dashboard)
 // ==========================
+
+export async function saveSessionV2(data: SaveSessionV2Input) {
+  return apiFetch("/api/v2/session", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export async function fetchTopicsV2(child_id: string) {
   return apiFetch(`/api/v2/topics/${child_id}`, {
     method: "GET",

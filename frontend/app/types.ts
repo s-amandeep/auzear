@@ -8,7 +8,7 @@ export type QuestionResponse = {
   questions: string[];
 };
 
-type FeedbackInput = {
+export type FeedbackInput = {
   engagement: string;
   child_id: string;
   teachResult: {
