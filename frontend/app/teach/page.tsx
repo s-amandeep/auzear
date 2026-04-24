@@ -10,14 +10,13 @@ import PrerequisiteCard from "./components/PrerequisiteCard";
 import ParentTip from "./components/ParentTip";
 import FeedbackPanel from "./components/FeedbackPanel";
 import { useTeaching } from "../../hooks/useTeaching";
-import { TeachingInput, QuestionResponse } from "../types";
+import { TeachingInput } from "../types";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
-// import { useSearchParams } from "next/navigation";
-import { fetchLastTeaching } from "@/lib/api";
 
 export default function TeachPage() {
   const router = useRouter();
+
   const [saving, setSaving] = useState(false);
   const [currentClass, setCurrentClass] = useState("");
   const [engagement, setEngagement] = useState<
@@ -25,29 +24,6 @@ export default function TeachPage() {
   >("");
   const [hasStarted, setHasStarted] = useState(false);
   const [hasResult, setHasResult] = useState(false);
-
-  // const searchParams = useSearchParams();
-
-  const [mode, setMode] = useState<string | null>(null);
-  const [revisitTopic, setRevisitTopic] = useState("");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const params = new URLSearchParams(window.location.search);
-
-    const m = params.get("mode");
-    const topic = params.get("topic");
-
-    setMode(m);
-    setRevisitTopic(topic || "");
-  }, []);
-
-  // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
-  const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
-
-  const [revisitData, setRevisitData] = useState<any>(null);
-  const isRevisit = mode === "revisit";
 
   const {
     loading,
@@ -59,6 +35,11 @@ export default function TeachPage() {
     parentTip,
     prerequisite,
     error,
+    nextStep,
+    teachingMode,
+    changeTeachingMode,
+    deepDive,
+    modeLoading,
   } = useTeaching();
 
   const loadingMessages = [
@@ -66,6 +47,13 @@ export default function TeachPage() {
     "Making this easy for your child...",
     "Preparing something helpful...",
   ];
+
+  const labelMap: Record<string, string> = {
+    foundational: "Basic",
+    intermediate: "Go Deeper",
+    advanced: "Advanced",
+  };
+
   const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -79,43 +67,11 @@ export default function TeachPage() {
       setLoadingMessage(loadingMessages[index]);
     }, 2000);
 
-    return () => clearInterval(interval); // 🔥 cleanup
+    return () => clearInterval(interval);
   }, [loading]);
 
-  useEffect(() => {
-    if (!child_id) return;
-
-    if (mode === "revisit" && revisitTopic) {
-      loadLastTeaching();
-    }
-  }, [mode, revisitTopic, child_id]);
-
-  const loadLastTeaching = async () => {
-    try {
-      if (!revisitTopic || !child_id) return;
-
-      setHasStarted(true);
-      setHasResult(false);
-
-      const res = await fetchLastTeaching(revisitTopic, child_id);
-
-      if (!res || (res as any).error || !res.teaching) {
-        setHasStarted(false);
-        return;
-      }
-
-      // 🔥 IMPORTANT: store full object
-      setRevisitData(res.teaching);
-
-      setHasResult(true);
-    } catch (error) {
-      console.error("Revisit failed:", error);
-      setHasStarted(false);
-    }
-  };
-
-  // const msg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-  // setLoadingMessage(msg);
+  // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
+  const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
 
   const handleStart = async ({ topic, classLevel }: TeachingInput) => {
     trackEvent("teach_started", { topic });
@@ -145,14 +101,12 @@ export default function TeachPage() {
       await submitFeedback({
         engagement,
         child_id,
-        teachResult: isRevisit
-          ? revisitData
-          : {
-              teach: result,
-              questions: questions?.questions,
-              parentTip,
-              prerequisite,
-            },
+        teachResult: {
+          teach: result,
+          questions: questions?.questions,
+          parentTip,
+          prerequisite,
+        },
       });
 
       setShowSuccess(true);
@@ -161,113 +115,116 @@ export default function TeachPage() {
       setTimeout(() => {
         router.push("/dashboard");
       }, 2000);
-    } catch (error) {
+    } catch {
       alert("Failed to save session");
     }
   };
 
-  const handleImprove = async () => {
-    if (!currentTopic) return;
-
-    trackEvent("teach_improve_clicked", { currentTopic, engagement });
-
-    setHasStarted(true);
-    setHasResult(false);
-
-    const res = await startTeaching({
-      topic: currentTopic,
-      classLevel: currentClass,
-      ...(engagement && { engagement }),
-    });
-
-    if (res) {
-      setHasResult(true);
-    } else {
-      setHasStarted(false);
-    }
-  };
-
-  const teachingContent = isRevisit ? revisitData?.teach : result;
-
-  if (mode === "revisit" && revisitTopic === "") {
-    return (
-      <p className="text-gray-500 text-center mt-10">
-        Invalid topic. Please try again.
-      </p>
-    );
-  }
-
   return (
     <main className="flex flex-col items-center p-6 gap-6">
+      {/* Header */}
       <h1 className="text-2xl font-bold">
-        {isRevisit ? " " : "Teach a Concept"}
+        {hasResult ? `Teach - ${currentTopic}` : "Teach a Concept"}
       </h1>
 
-      {!isRevisit && <ConceptForm onSubmit={handleStart} loading={loading} />}
-
-      {!hasResult && !isRevisit && (
-        <p className="text-xs text-gray-500 text-center mt-1">
-          We’ll guide you step by step — no prep needed
-        </p>
+      {/* Form */}
+      {!hasResult && (
+        <>
+          <ConceptForm onSubmit={handleStart} loading={loading} />
+          <p className="text-xs text-gray-500 text-center mt-1">
+            We’ll guide you step by step — no prep needed
+          </p>
+        </>
       )}
 
+      {/* Loading */}
       {hasStarted && !hasResult && (
-        <div className="mt-4 text-center">
-          <p className="text-gray-500">{loadingMessage}</p>
-        </div>
+        <p className="text-gray-500 text-center mt-4">{loadingMessage}</p>
       )}
 
+      {/* Error */}
       {error && (
         <p className="text-sm text-red-500 text-center mt-2">{error}</p>
       )}
 
-      {isRevisit && revisitTopic && (
-        <div className="text-center mb-2">
-          <h1 className="text-2xl font-semibold capitalize">{revisitTopic}</h1>
-          <p className="text-sm text-gray-500">Revisiting this concept</p>
+      {/* Teaching */}
+      {hasResult && result && (
+        <TeachingCard topic={currentTopic} teach={result} />
+      )}
+
+      {/* Mode Switch */}
+      {hasResult && !modeLoading && (
+        <div className="flex flex-col items-center mt-4">
+          <p className="text-xs text-gray-500 mb-2">
+            Teaching level:{" "}
+            <span className="font-medium">{labelMap[teachingMode]}</span>
+          </p>
+
+          <div className="flex gap-2">
+            {["foundational", "intermediate", "advanced"].map((mode) => (
+              <button
+                key={mode}
+                onClick={() => changeTeachingMode(mode as any)}
+                className={`px-3 py-1 rounded-lg text-sm border ${
+                  teachingMode === mode
+                    ? "bg-black text-white"
+                    : "bg-white text-gray-700"
+                }`}
+              >
+                {labelMap[mode]}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      {isRevisit && <div className="h-px w-full bg-gray-200 my-2" />}
-
-      {hasResult && teachingContent && (
-        <TeachingCard
-          topic={isRevisit ? revisitTopic : currentTopic}
-          teach={isRevisit ? revisitData?.teach : result}
-        />
+      {/* Mode Loading */}
+      {modeLoading && (
+        <p className="text-sm text-gray-500 mt-4">
+          Updating explanation for {labelMap[teachingMode]} level...
+        </p>
       )}
 
-      {hasResult && (
-        <ParentTip tip={isRevisit ? revisitData?.parentTip : parentTip} />
+      {/* Deep Dive */}
+      {teachingMode === "advanced" && deepDive && (
+        <div className="bg-blue-50 p-3 rounded-xl w-full max-w-lg mt-3">
+          <p className="text-sm font-medium mb-1">Let’s think deeper:</p>
+          <p className="text-sm text-gray-800">{deepDive}</p>
+        </div>
       )}
 
-      {hasResult && (
-        <PrerequisiteCard
-          data={isRevisit ? revisitData?.prerequisite : prerequisite}
-        />
-      )}
+      {/* Extras */}
+      {hasResult && <ParentTip tip={parentTip} />}
+      {hasResult && <PrerequisiteCard data={prerequisite} />}
+      {hasResult && <QuestionsCard questions={questions?.questions} />}
 
-      {hasResult && (
-        <QuestionsCard
-          questions={isRevisit ? revisitData?.questions : questions?.questions}
-        />
-      )}
-
+      {/* Feedback */}
       {hasResult && result && (
         <FeedbackPanel
           engagement={engagement}
           setEngagement={setEngagement}
-          onImprove={handleImprove}
           onDone={handleFinalSave}
         />
       )}
 
+      {/* Success */}
       {showSuccess && (
         <p className="text-green-600 text-sm text-center mt-3">
           Nice! One concept strengthened today 🌱
         </p>
       )}
 
+      {/* Next Step */}
+      {nextStep && (
+        <div className="bg-gray-50 p-3 rounded-xl w-full max-w-lg mt-3">
+          <p className="text-sm font-medium">What to explore next:</p>
+          <p className="text-sm text-gray-700">
+            <b>{nextStep.topic}</b> — {nextStep.reason}
+          </p>
+        </div>
+      )}
+
+      {/* Footer */}
       <p className="text-xs text-gray-400 text-center mt-10 mb-4">
         You don’t need to be perfect — just consistent 💛
       </p>

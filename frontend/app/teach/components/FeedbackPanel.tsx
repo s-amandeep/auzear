@@ -1,14 +1,12 @@
 type Props = {
   engagement: string;
   setEngagement: (val: any) => void;
-  onImprove: () => void;
   onDone: () => void;
 };
 
 export default function FeedbackPanel({
   engagement,
   setEngagement,
-  onImprove,
   onDone,
 }: Props) {
   const options = [
@@ -49,18 +47,18 @@ export default function FeedbackPanel({
 
       {engagement && (
         <>
-          <button
+          {/* <button
             className="mt-4 bg-black text-white px-4 py-2 rounded-xl"
             onClick={onImprove}
           >
             {getButtonText()}
-          </button>
+          </button> */}
 
           <button
-            className="mt-2 border px-4 py-2 rounded-xl"
+            className="mt-4 bg-black text-white px-4 py-2 rounded-xl"
             onClick={onDone}
           >
-            Done for now
+            Submit Feedback
           </button>
         </>
       )}

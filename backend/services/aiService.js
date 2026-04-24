@@ -14,7 +14,7 @@ async function generateFromPrompt(prompt) {
     const aiPromise = client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 400, // 🔥 slightly reduced to control cost
+      max_tokens: 1800, // 🔥 slightly reduced to control cost
       temperature: 0.7, // balanced creativity + consistency
     });
 

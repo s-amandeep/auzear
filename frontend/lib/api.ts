@@ -169,3 +169,95 @@ export async function fetchTopicTeaching(child_id: string, topic: string) {
     method: "GET",
   });
 }
+
+// ==========================
+// 🔥 V2: Teaching (Depth-based)
+// ==========================
+export async function fetchTeachingV2({
+  topic,
+  classLevel,
+  child_id,
+  teaching_mode = "foundational",
+}: {
+  topic: string;
+  classLevel: number; // ✅ number now
+  child_id: string;
+  teaching_mode?: "foundational" | "intermediate" | "advanced";
+}) {
+  return apiFetch("/api/v2/teaching", {
+    method: "POST",
+    body: JSON.stringify({
+      topic,
+      classLevel,
+      child_id,
+      teaching_mode,
+    }),
+  });
+}
+
+// ==========================
+// 🔥 V2: Save Session
+// ==========================
+export async function saveSessionV2({
+  topic,
+  subject,
+  classLevel,
+  child_id,
+  teaching_mode,
+  understanding_score,
+  teach,
+  practice,
+  parent_tip,
+  prerequisite,
+}: {
+  topic: string;
+  subject: string;
+  classLevel: number;
+  child_id: string;
+  teaching_mode: "foundational" | "intermediate" | "advanced";
+  understanding_score: number;
+  teach: any;
+  practice: any;
+  parent_tip: string;
+  prerequisite: any;
+}) {
+  return apiFetch("/api/v2/session", {
+    method: "POST",
+    body: JSON.stringify({
+      topic,
+      subject,
+      classLevel,
+      child_id,
+      teaching_mode,
+      understanding_score,
+      teach,
+      practice,
+      parent_tip,
+      prerequisite,
+    }),
+  });
+}
+
+// ==========================
+// 🔥 V2: Fetch Topics (New Dashboard)
+// ==========================
+export async function fetchTopicsV2(child_id: string) {
+  return apiFetch(`/api/v2/topics/${child_id}`, {
+    method: "GET",
+  });
+}
+
+// ==========================
+// 🔥 V2: Fetch Topic Detail (Last Session)
+// ==========================
+export async function fetchTopicDetailV2({
+  child_id,
+  concept_id,
+}: {
+  child_id: string;
+  concept_id: string;
+}) {
+  return apiFetch(`/api/v2/topics/${child_id}/${concept_id}`, {
+    method: "GET",
+  });
+}

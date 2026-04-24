@@ -8,14 +8,15 @@ export type QuestionResponse = {
   questions: string[];
 };
 
-export type FeedbackInput = {
-  // topic: string;
-  // subject: string;
-  // classLevel: string;
-  // score: number;
-  engagement: "low" | "medium" | "high" | "very_high";
-  child_id: string; // ✅ add child ID to feedback
-  teachResult: string; // ✅ add result to feedback
+type FeedbackInput = {
+  engagement: string;
+  child_id: string;
+  teachResult: {
+    teach: string;
+    questions?: string[];
+    parentTip?: string;
+    prerequisite?: any;
+  };
 };
 
 export type SubjectStat = {

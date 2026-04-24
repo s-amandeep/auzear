@@ -30,6 +30,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/v2/teaching", require("./routes/teachingRoutesV2"));
+app.use("/api/v2/session", require("./routes/sessionRoutesV2"));
+app.use("/api/v2/topics", require("./routes/topicRoutesV2"));
+
 app.use("/api/teaching", teachingRoutes);
 app.use("/api/session", sessionRoutes);
 app.use("/api/revision", revisionRoutes);
