@@ -4,6 +4,8 @@ const { getTeachingPromptV2 } = require("../prompts/teachingPromptV2");
 const { getConceptMapPrompt } = require("../prompts/conceptMapPrompt");
 
 async function generateTeaching({ topic, classLevel, teaching_mode }) {
+  if (!topic) return null;
+
   const normalizedTopic = topic.trim().toLowerCase();
 
   function safeParseJSON(raw) {
@@ -35,8 +37,8 @@ async function generateTeaching({ topic, classLevel, teaching_mode }) {
     getTeachingPromptV2(normalizedTopic, classLevel, teaching_mode, conceptMap),
   );
 
-  console.log("Teaching Raw:", teachingRaw);
-  console.log("AI response length:", teachingRaw.length);
+  // console.log("Teaching Raw:", teachingRaw);
+  // console.log("AI response length:", teachingRaw.length);
 
   if (!teachingRaw || teachingRaw.length < 50) {
     throw new Error("Empty or incomplete AI response");

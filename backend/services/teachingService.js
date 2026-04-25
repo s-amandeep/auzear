@@ -10,6 +10,8 @@ async function generateTeachingService({
   child_id,
   engagement,
 }) {
+  if (!child_id || !topic) return null;
+
   const normalizedTopic = topic.trim().toLowerCase();
 
   // 1. Fetch context
@@ -43,6 +45,8 @@ async function generateTeachingService({
 }
 
 async function getLastTeachingService(topic, child_id) {
+  if (!child_id || !topic) return null;
+  
   const normalizedTopic = topic.trim().toLowerCase();
 
   const { data: concept } = await supabase

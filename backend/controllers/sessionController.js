@@ -13,7 +13,7 @@ async function saveSession(req, res) {
       subject,
       engagement,
       child_id,
-      teachResult,
+      // teachResult,
     });
 
     res.json(result);

@@ -9,14 +9,10 @@ export type QuestionResponse = {
 };
 
 export type FeedbackInput = {
-  engagement: string;
+  topic: string;
   child_id: string;
-  teachResult: {
-    teach: string;
-    questions?: string[];
-    parentTip?: string;
-    prerequisite?: any;
-  };
+  engagement: "low" | "medium" | "high" | "very_high";
+  concept_id?: string;
 };
 
 export type SubjectStat = {

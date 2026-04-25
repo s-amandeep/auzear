@@ -100,30 +100,30 @@ export async function fetchQuestions({
 }
 
 // Save Session
-export async function saveSession({
-  topic,
-  subject,
-  child_id,
-  engagement,
-  teachResult,
-}: {
-  topic: string;
-  subject: string;
-  child_id: string;
-  engagement: string;
-  teachResult: any;
-}) {
-  return apiFetch("/api/session", {
-    method: "POST",
-    body: JSON.stringify({
-      topic,
-      subject,
-      child_id,
-      engagement,
-      teachResult,
-    }),
-  });
-}
+// export async function saveSession({
+//   topic,
+//   subject,
+//   child_id,
+//   engagement,
+//   teachResult,
+// }: {
+//   topic: string;
+//   subject: string;
+//   child_id: string;
+//   engagement: string;
+//   teachResult: any;
+// }) {
+//   return apiFetch("/api/session", {
+//     method: "POST",
+//     body: JSON.stringify({
+//       topic,
+//       subject,
+//       child_id,
+//       engagement,
+//       teachResult,
+//     }),
+//   });
+// }
 
 // Revision Dashboard
 export async function fetchRevision(child_id: string) {
@@ -201,7 +201,6 @@ export async function fetchTeachingV2({
 
 type SaveSessionV2Input =
   | {
-      // 🟢 NEW TEACH FLOW
       topic: string;
       subject: string;
       classLevel: number;
@@ -212,10 +211,11 @@ type SaveSessionV2Input =
       practice: string[];
       parent_tip: string;
       prerequisite: any;
+      deep_dive?: string | null; // 🔥 ADD
+      next_step?: any; // 🔥 ADD
       concept_id?: never;
     }
   | {
-      // 🔵 REVISIT FLOW
       concept_id: string;
       child_id: string;
       teaching_mode: "foundational" | "intermediate" | "advanced";
@@ -224,6 +224,8 @@ type SaveSessionV2Input =
       practice: string[];
       parent_tip: string;
       prerequisite: any;
+      deep_dive?: string | null; // 🔥 ADD
+      next_step?: any; // 🔥 ADD
       topic?: never;
       subject?: never;
       classLevel?: never;

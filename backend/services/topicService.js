@@ -25,6 +25,8 @@ async function getAllTopicsService(child_id) {
 }
 
 async function getTopicTeachingService(child_id, topic) {
+  if (!child_id || !topic) return null;
+  
   const normalizedTopic = topic.trim().toLowerCase();
 
   // 1. Find concept

@@ -9,8 +9,10 @@ async function saveSessionService({
   subject,
   engagement,
   child_id,
-  teachResult,
+  // teachResult,
 }) {
+  if (!child_id || !topic) return null;
+  
   const normalizedTopic = topic.trim().toLowerCase();
   const currentScore = getScoreFromEngagement(engagement);
 
@@ -72,7 +74,7 @@ async function saveSessionService({
       memory_strength: newMemory,
       revision_level: newLevel,
       trend,
-      last_teaching: teachResult,
+      // last_teaching: teachResult,
     },
     {
       onConflict: "child_id,concept_id",

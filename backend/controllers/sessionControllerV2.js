@@ -3,6 +3,7 @@ const { saveSession } = require("../services/sessionServiceV2");
 
 async function saveSessionV2(req, res) {
   try {
+    console.log(req.body);
     const result = await saveSession(req.body);
     res.json({ success: true, data: result });
   } catch (err) {

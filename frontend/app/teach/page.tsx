@@ -98,15 +98,21 @@ export default function TeachPage() {
     try {
       setSaving(true);
 
+      // await submitFeedback({
+      //   topic: currentTopic,
+      //   engagement,
+      //   child_id,
+      //   teachResult: {
+      //     teach: result,
+      //     questions: questions?.questions,
+      //     parentTip,
+      //     prerequisite,
+      //   },
+      // });
       await submitFeedback({
+        topic: currentTopic,
         engagement,
         child_id,
-        teachResult: {
-          teach: result,
-          questions: questions?.questions,
-          parentTip,
-          prerequisite,
-        },
       });
 
       setShowSuccess(true);
@@ -115,8 +121,10 @@ export default function TeachPage() {
       setTimeout(() => {
         router.push("/dashboard");
       }, 2000);
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Failed to save session");
+      setSaving(false);
     }
   };
 

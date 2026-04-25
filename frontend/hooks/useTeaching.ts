@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import {
   fetchTeaching,
-  saveSession,
   fetchTeachingV2,
   saveSessionV2,
 } from "../lib/api";
@@ -94,48 +93,47 @@ export function useTeaching() {
   };
 
   const submitFeedback = async ({
+    topic,
     engagement,
     child_id,
-    teachResult,
+    concept_id,
   }: FeedbackInput) => {
     try {
-      const useV2 = true;
-
       let response;
 
-      if (useV2) {
-        // 🔥 Convert engagement → score
-        let score = 60;
+      let score = 60;
 
-        if (engagement === "low") score = 30;
-        else if (engagement === "medium") score = 60;
-        else if (engagement === "high") score = 80;
-        else if (engagement === "very_high") score = 95;
+      if (engagement === "low") score = 30;
+      else if (engagement === "medium") score = 60;
+      else if (engagement === "high") score = 80;
+      else if (engagement === "very_high") score = 95;
+      console.log("latest score ", score);
 
-        response = await saveSessionV2({
-          topic: currentTopic,
-          subject: currentSubject || "General",
-          classLevel: Number(currentClass),
-          child_id,
-
-          teaching_mode: teachingMode, // 🔥 NEW
-
-          understanding_score: score,
-
-          teach: result, // 🔥 explanation
-          practice: questions?.questions || [],
-          parent_tip: parentTip,
-          prerequisite: prerequisite,
-        });
-      } else {
-        response = await saveSession({
-          topic: currentTopic,
-          subject: currentSubject || "General",
-          child_id,
-          engagement,
-          teachResult,
-        });
+      if (!result) {
+        alert("No teaching content to save");
+        return;
       }
+
+      response = await saveSessionV2({
+        ...(concept_id
+          ? { concept_id }
+          : {
+              topic,
+              subject: currentSubject || "General",
+              classLevel: Number(currentClass),
+            }),
+
+        child_id,
+        teaching_mode: teachingMode,
+        understanding_score: score,
+
+        teach: result,
+        practice: questions?.questions || [],
+        parent_tip: parentTip,
+        prerequisite,
+        deep_dive: deepDive,
+        next_step: nextStep,
+      });
 
       return response;
     } catch (error) {
@@ -146,7 +144,7 @@ export function useTeaching() {
 
   const changeTeachingMode = async (
     newMode: "foundational" | "intermediate" | "advanced",
-  ) => {    
+  ) => {
     setTeachingMode(newMode);
     setModeLoading(true);
 
@@ -178,6 +176,18 @@ export function useTeaching() {
     setModeLoading(false);
   };
 
+  const hydrateTeaching = (data: any, classLevel: number) => {
+    setCurrentTopic(data.conceptName);
+    setCurrentSubject(data.subject || "General");
+    setResult(data.teach);
+    setQuestions({ questions: data.practice || [] });
+    setParentTip(data.parent_tip || "");
+    setPrerequisite(data.prerequisite || null);
+    setNextStep(data.next_step || null);
+    setDeepDive(data.deep_dive || null);
+    setCurrentClass(String(classLevel || 5));
+  };
+
   return {
     loading,
     currentTopic,
@@ -196,5 +206,6 @@ export function useTeaching() {
     changeTeachingMode,
     deepDive,
     modeLoading,
+    hydrateTeaching,
   };
 }
