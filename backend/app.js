@@ -6,12 +6,8 @@ const { apiLimiter } = require("./middleware/rateLimiter");
 
 const app = express();
 
-const teachingRoutes = require("./routes/teachingRoutes");
-const sessionRoutes = require("./routes/sessionRoutes");
-const revisionRoutes = require("./routes/revisionRoutes");
-const questionRoutes = require("./routes/questionRoutes");
+
 const insightRoutes = require("./routes/insightRoutes");
-const topicRoutes = require("./routes/topicRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 app.use("/api", apiLimiter);
@@ -34,12 +30,7 @@ app.use("/api/v2/teaching", require("./routes/teachingRoutesV2"));
 app.use("/api/v2/session", require("./routes/sessionRoutesV2"));
 app.use("/api/v2/topics", require("./routes/topicRoutesV2"));
 
-app.use("/api/teaching", teachingRoutes);
-app.use("/api/session", sessionRoutes);
-app.use("/api/revision", revisionRoutes);
-app.use("/api/questions", questionRoutes);
 app.use("/api/insights", insightRoutes);
-app.use("/api/topics", topicRoutes);
 
 app.use(errorHandler); // 🔥 MUST be last
 

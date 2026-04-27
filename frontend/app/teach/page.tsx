@@ -50,7 +50,7 @@ export default function TeachPage() {
 
   const labelMap: Record<string, string> = {
     foundational: "Basic",
-    intermediate: "Go Deeper",
+    intermediate: "Higher",
     advanced: "Advanced",
   };
 
