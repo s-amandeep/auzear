@@ -19,6 +19,7 @@ export default function TeachPage() {
 
   const [saving, setSaving] = useState(false);
   const [currentClass, setCurrentClass] = useState("");
+  const [topic, setTopic] = useState("");
   const [engagement, setEngagement] = useState<
     "low" | "medium" | "high" | "very_high" | ""
   >("");
@@ -42,6 +43,9 @@ export default function TeachPage() {
     modeLoading,
   } = useTeaching();
 
+  // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
+  const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
+
   const loadingMessages = [
     "Thinking of a simple way to explain...",
     "Making this easy for your child...",
@@ -53,6 +57,27 @@ export default function TeachPage() {
     intermediate: "Higher",
     advanced: "Advanced",
   };
+
+  useEffect(() => {
+    const prefill = localStorage.getItem("prefill_data");
+    console.log("prefill - ", prefill);
+
+    if (prefill) {
+      try {
+        const { topic, classLevel } = JSON.parse(prefill);
+
+        if (topic) setTopic(topic);
+
+        // 🔥 IMPORTANT: ALWAYS respect revisit class
+        if (classLevel) {
+          setCurrentClass(classLevel);
+        }
+
+        localStorage.removeItem("prefill_data");
+        return; // 🔥 STOP HERE (don't fallback)
+      } catch {}
+    }
+  }, []);
 
   const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -70,9 +95,6 @@ export default function TeachPage() {
     return () => clearInterval(interval);
   }, [loading]);
 
-  // const child_id = typeof window !== "undefined" ? localStorage.getItem("child_id") : null;
-  const child_id = "c3658790-741b-4823-be25-0822ba4e72df"; // temp TODO: get from params or context
-
   const handleStart = async ({ topic, classLevel }: TeachingInput) => {
     trackEvent("teach_started", { topic });
 
@@ -82,11 +104,13 @@ export default function TeachPage() {
     const res = await startTeaching({ topic, classLevel });
 
     if (res) {
+      localStorage.setItem("selected_class", classLevel);
       setCurrentClass(classLevel);
       setHasResult(true);
     } else {
       setHasStarted(false);
     }
+    setTopic(""); // optional
   };
 
   const handleFinalSave = async () => {
@@ -98,17 +122,6 @@ export default function TeachPage() {
     try {
       setSaving(true);
 
-      // await submitFeedback({
-      //   topic: currentTopic,
-      //   engagement,
-      //   child_id,
-      //   teachResult: {
-      //     teach: result,
-      //     questions: questions?.questions,
-      //     parentTip,
-      //     prerequisite,
-      //   },
-      // });
       await submitFeedback({
         topic: currentTopic,
         engagement,
@@ -138,7 +151,14 @@ export default function TeachPage() {
       {/* Form */}
       {!hasResult && (
         <>
-          <ConceptForm onSubmit={handleStart} loading={loading} />
+          <ConceptForm
+            topic={topic}
+            setTopic={setTopic}
+            classLevel={currentClass}
+            setClassLevel={setCurrentClass}
+            onSubmit={handleStart}
+            loading={loading}
+          />
           <p className="text-xs text-gray-500 text-center mt-1">
             We’ll guide you step by step — no prep needed
           </p>
@@ -223,12 +243,29 @@ export default function TeachPage() {
       )}
 
       {/* Next Step */}
-      {nextStep && (
+      {hasResult && nextStep && (
         <div className="bg-gray-50 p-3 rounded-xl w-full max-w-lg mt-3">
           <p className="text-sm font-medium">What to explore next:</p>
           <p className="text-sm text-gray-700">
             <b>{nextStep.topic}</b> — {nextStep.reason}
           </p>
+
+          <button
+            className="text-sm underline mt-2"
+            onClick={() => {
+              // localStorage.setItem("prefill_topic", nextStep.topic);
+              // localStorage.setItem("prefill_class", currentClass || ""); // 🔥 IMPORTANT
+              // router.push("/teach");
+              setTopic(nextStep.topic); // 👈 update form immediately
+              setCurrentClass(currentClass || ""); // keep same class
+              // 🔥 FULL RESET (CRITICAL)
+              setHasResult(false);
+              setHasStarted(false);
+              setEngagement("");
+            }}
+          >
+            Start this →
+          </button>
         </div>
       )}
 

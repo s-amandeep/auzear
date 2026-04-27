@@ -64,6 +64,7 @@ async function fetchTopicDetail(child_id, concept_id) {
     practice: lastSession?.practice || [],
     parent_tip: lastSession?.parent_tip || "",
     prerequisite: lastSession?.prerequisite || null,
+    class_level: lastSession?.class_level || 2,
 
     teaching_mode: lastSession?.teaching_mode || "foundational",
     understanding_score: lastSession?.understanding_score || 0,

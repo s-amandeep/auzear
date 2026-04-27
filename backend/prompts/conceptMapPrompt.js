@@ -16,6 +16,9 @@ Instructions:
 4. Identify COMMON MISTAKES students make
 5. Identify 1–2 PREREQUISITE concepts (if needed)
 6. Suggest 2 NEXT TOPICS that should be taught after this
+  - Must logically follow current topic
+  - Must match Class ${classLevel}  
+  - Avoid random or unrelated topics
 
 Important:
 - Adapt depth based on class level

@@ -78,8 +78,9 @@ TASKS:
        - At least one question must require explanation, not just answer
        - Avoid direct formula-based questions
        - Encourage reasoning or comparison
-7. Suggest NEXT STEP:
-   - Recommend 1 next topic from "next_topics"
+7. Suggest NEXT STEP(next_step):
+   - Recommend ONE meaningful next topic from "next_topics"
+   - Should deepen or extend understanding
    - Explain why it should be taught next
 8. If the topic depends on a prerequisite concept AND the student may struggle:
 
@@ -102,7 +103,7 @@ Return ONLY JSON:
   "parent_tip": "...",
   "next_step": {
     "topic": "...",
-    "reason": "..."
+    "reason": "Why this helps next"
   },
   "prerequisite": {
     "concept": "...",

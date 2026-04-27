@@ -68,7 +68,7 @@ export default function TeachRevisit() {
       setData(res);
 
       // 🔥 IMPORTANT: hydrate AFTER data
-      hydrateTeaching(res, res.class_level || 5);
+      hydrateTeaching(res, res.class_level ?? res.classLevel ?? 5);
 
       setLoading(false);
     };
@@ -191,7 +191,18 @@ export default function TeachRevisit() {
 
           <button
             className="text-sm underline mt-2"
-            onClick={() => router.push(`/teach/${data.next_step.concept_id}`)}
+            onClick={() => {
+              localStorage.setItem(
+                "prefill_data",
+                JSON.stringify({
+                  topic: data.next_step.topic,
+                  classLevel: String(data.class_level ?? data.classLevel ?? ""),
+                }),
+              );
+              console.log("Revisit class:", data.class_level);
+
+              router.push("/teach");
+            }}
           >
             Start this →
           </button>
