@@ -198,8 +198,7 @@ export default function TeachRevisit() {
                   topic: data.next_step.topic,
                   classLevel: String(data.class_level ?? data.classLevel ?? ""),
                 }),
-              );
-              console.log("Revisit class:", data.class_level);
+              );              
 
               router.push("/teach");
             }}
