@@ -1,6 +1,28 @@
 // services/worksheetPdfService.js
 const { PDFDocument, StandardFonts } = require("pdf-lib");
 
+function wrapText(text, maxWidth, font, fontSize) {
+  const words = text.split(" ");
+  const lines = [];
+  let currentLine = "";
+
+  words.forEach((word) => {
+    const testLine = currentLine ? currentLine + " " + word : word;
+    const width = font.widthOfTextAtSize(testLine, fontSize);
+
+    if (width < maxWidth) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+
+  if (currentLine) lines.push(currentLine);
+
+  return lines;
+}
+
 async function createWorksheetPDF(data) {
   const { topic, classLevel, questions, answers } = data;
 
@@ -11,34 +33,54 @@ async function createWorksheetPDF(data) {
 
   let y = 750;
 
-  const draw = (text, size = 12) => {
-    page.drawText(text, { x: 50, y, size, font });
-    y -= 18;
+  // const draw = (text, size = 12) => {
+  //   page.drawText(text, { x: 50, y, size, font });
+  //   y -= 18;
+  // };
+  const drawWrappedText = (text, fontSize = 12) => {
+    // const maxWidth = 500; // adjust based on page width
+    const maxWidth = page.getWidth() - 100;
+
+    const lines = wrapText(text, maxWidth, font, fontSize);
+
+    lines.forEach((line) => {
+      if (y < 50) {
+        // 🔥 new page if needed
+        page = pdfDoc.addPage();
+        y = 750;
+      }
+
+      page.drawText(line, { x: 50, y, size: fontSize, font });
+      y -= fontSize + 4;
+    });
+
+    y -= 4; // spacing between blocks
   };
 
   // Header
-  draw("Auzear Learning", 18);
-  draw(`Topic: ${topic} | Class: ${classLevel}`, 12);
+  drawWrappedText("Auzear Learning", 18);
+  drawWrappedText(`Topic: ${topic} | Class: ${classLevel}`, 12);
   y -= 10;
 
-  draw(answers.length ? "Worksheet + Answers" : "Worksheet", 12);
+  drawWrappedText(answers.length ? "Worksheet + Answers" : "Worksheet", 12);
   // Questions
-  draw("Questions:", 14);
+  drawWrappedText("Questions:", 14);
 
   questions.forEach((q, i) => {
-    draw(`${i + 1}. ${q}`);
+    drawWrappedText(`${i + 1}. ${q}`);
+    y -= 6;
   });
 
   y -= 20;
 
-  draw("Answers:", 14);
+  drawWrappedText("Answers:", 14);
 
   if (answers && answers.length > 0) {
     y -= 20;
-    draw("Answers:", 14);
+    drawWrappedText("Answers:", 14);
 
     answers.forEach((a, i) => {
-      draw(`${i + 1}. ${a}`);
+      drawWrappedText(`${i + 1}. ${a}`);
     });
   }
 

@@ -9,6 +9,7 @@ import ParentTip from "../components/ParentTip";
 import PrerequisiteCard from "../components/PrerequisiteCard";
 import FeedbackPanel from "../components/FeedbackPanel";
 import { useTeaching } from "../../../hooks/useTeaching";
+import WorksheetModal from "../../components/WorksheetModal";
 
 export default function TeachRevisit() {
   const router = useRouter();
@@ -44,6 +45,7 @@ export default function TeachRevisit() {
   const [error, setError] = useState("");
   const [data, setData] = useState<any>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showWorksheet, setShowWorksheet] = useState(false);
 
   // 🔥 LOAD DATA
   useEffect(() => {
@@ -168,12 +170,26 @@ export default function TeachRevisit() {
       {/* Questions */}
       <QuestionsCard questions={questions?.questions || data.practice} />
 
+      {/* <WorksheetGenerator
+        topic={data.conceptName}
+        classLevel={String(data.class_level)}
+        teachingMode={teachingMode}
+        understandingScore={data.understanding_score}
+      /> */}
+
       {/* Feedback */}
       <FeedbackPanel
         engagement={engagement}
         setEngagement={setEngagement}
         onDone={handleSave}
       />
+
+      <button
+        onClick={() => setShowWorksheet(true)}
+        className="mt-4 px-4 py-2 border rounded-xl text-sm"
+      >
+        Generate Worksheet
+      </button>
 
       {showSuccess && (
         <p className="text-green-600 text-sm text-center mt-3">
@@ -198,7 +214,7 @@ export default function TeachRevisit() {
                   topic: data.next_step.topic,
                   classLevel: String(data.class_level ?? data.classLevel ?? ""),
                 }),
-              );              
+              );
 
               router.push("/teach");
             }}
@@ -207,6 +223,15 @@ export default function TeachRevisit() {
           </button>
         </div>
       )}
+
+      <WorksheetModal
+        isOpen={showWorksheet}
+        onClose={() => setShowWorksheet(false)}
+        topic={data.conceptName}
+        classLevel={String(data.class_level)}
+        teachingMode={data.teaching_mode}
+        understandingScore={data.understanding_score}
+      />
     </main>
   );
 }

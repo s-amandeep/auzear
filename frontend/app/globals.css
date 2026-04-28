@@ -17,7 +17,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
-    color-scheme: light;      
+    color-scheme: light;
   }
 }
 
@@ -28,3 +28,7 @@ body {
   color: #000000;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* body.modal-open {
+  overflow: hidden;
+} */

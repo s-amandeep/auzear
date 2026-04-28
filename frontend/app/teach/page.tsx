@@ -13,12 +13,14 @@ import { useTeaching } from "../../hooks/useTeaching";
 import { TeachingInput } from "../types";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
+import WorksheetModal from "../components/WorksheetModal";
 
 export default function TeachPage() {
   const router = useRouter();
 
   const [saving, setSaving] = useState(false);
   const [currentClass, setCurrentClass] = useState("");
+  const [showWorksheet, setShowWorksheet] = useState(false);
   const [topic, setTopic] = useState("");
   const [engagement, setEngagement] = useState<
     "low" | "medium" | "high" | "very_high" | ""
@@ -226,6 +228,15 @@ export default function TeachPage() {
       {hasResult && <PrerequisiteCard data={prerequisite} />}
       {hasResult && <QuestionsCard questions={questions?.questions} />}
 
+      {/* {hasResult && (
+        <WorksheetGenerator
+          topic={currentTopic}
+          classLevel={currentClass}
+          teachingMode={teachingMode}
+          understandingScore={60} // replace later with real score
+        />
+      )} */}
+
       {/* Feedback */}
       {hasResult && result && (
         <FeedbackPanel
@@ -233,6 +244,15 @@ export default function TeachPage() {
           setEngagement={setEngagement}
           onDone={handleFinalSave}
         />
+      )}
+
+      {hasResult && (
+        <button
+          onClick={() => setShowWorksheet(true)}
+          className="mt-4 px-4 py-2 border rounded-xl text-sm"
+        >
+          Generate Worksheet
+        </button>
       )}
 
       {/* Success */}
@@ -253,9 +273,6 @@ export default function TeachPage() {
           <button
             className="text-sm underline mt-2"
             onClick={() => {
-              // localStorage.setItem("prefill_topic", nextStep.topic);
-              // localStorage.setItem("prefill_class", currentClass || ""); // 🔥 IMPORTANT
-              // router.push("/teach");
               setTopic(nextStep.topic); // 👈 update form immediately
               setCurrentClass(currentClass || ""); // keep same class
               // 🔥 FULL RESET (CRITICAL)
@@ -268,6 +285,15 @@ export default function TeachPage() {
           </button>
         </div>
       )}
+
+      <WorksheetModal
+        isOpen={showWorksheet}
+        onClose={() => setShowWorksheet(false)}
+        topic={currentTopic}
+        classLevel={currentClass}
+        teachingMode={teachingMode}
+        understandingScore={60}
+      />
 
       {/* Footer */}
       <p className="text-xs text-gray-400 text-center mt-10 mb-4">

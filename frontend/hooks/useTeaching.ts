@@ -1,11 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  fetchTeaching,
-  fetchTeachingV2,
-  saveSessionV2,
-} from "../lib/api";
+import { fetchTeachingV2, saveSessionV2 } from "../lib/api";
 import { TeachingInput, QuestionResponse, FeedbackInput } from "../app/types";
 
 export function useTeaching() {
@@ -46,25 +42,13 @@ export function useTeaching() {
 
     let teaching;
 
-    // 🔥 TEMP SWITCH (safe rollout)
-    const useV2 = true;
-
     try {
-      if (useV2) {
-        teaching = await fetchTeachingV2({
-          topic,
-          classLevel: Number(classLevel),
-          child_id: storedChildId, // 🔥 TEMP fix
-          teaching_mode: teachingMode, // 👈 NEW
-        });
-      } else {
-        teaching = await fetchTeaching({
-          topic,
-          classLevel,
-          child_id: storedChildId, // 🔥 TEMP fix
-          ...(engagement && { engagement }),
-        });
-      }
+      teaching = await fetchTeachingV2({
+        topic,
+        classLevel: Number(classLevel),
+        child_id: storedChildId, // 🔥 TEMP fix
+        teaching_mode: teachingMode, // 👈 NEW
+      });
 
       if (teaching?.error) {
         setError(teaching.message);
