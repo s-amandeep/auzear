@@ -29,6 +29,8 @@ app.use((req, res, next) => {
 app.use("/api/v2/teaching", require("./routes/teachingRoutesV2"));
 app.use("/api/v2/session", require("./routes/sessionRoutesV2"));
 app.use("/api/v2/topics", require("./routes/topicRoutesV2"));
+app.use("/api/worksheet", require("./routes/worksheetRoutes"));
+app.use("/api/worksheet/pdf", require("./routes/worksheetPdfRoutes"));
 
 app.use("/api/insights", insightRoutes);
 
