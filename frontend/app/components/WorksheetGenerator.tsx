@@ -201,22 +201,22 @@ export default function WorksheetGenerator({
               {
                 key: "basic",
                 label: "Basic",
-                text: "direct recall from explanation",
+                text: "Recall from explanation",
               },
               {
                 key: "mixed",
                 label: "Mixed",
-                text: "recall + application + thinking",
+                text: "Recall + Application + Thinking",
               },
               {
                 key: "thinking",
                 label: "Thinking",
-                text: "reasoning, multi-step, scenario-based",
+                text: "Reasoning, Multi-step, Scenario-based",
               },
               {
                 key: "creative",
                 label: "Creative",
-                text: "real-world, open-ended, explanation-based",
+                text: "Real-world, Open-ended, Explanation-based",
               },
             ].map((item) => (
               <button
