@@ -72,7 +72,7 @@ async function generateTeaching({ topic, classLevel, teaching_mode }) {
 
   // 3. Safe parse
   const parsed = safeParseJSON(teachingRaw);
-  console.log(parsed);
+  // console.log(parsed);
 
   if (!parsed.teach) {
     throw new Error("Missing teach content");

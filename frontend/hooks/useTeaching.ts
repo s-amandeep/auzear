@@ -91,7 +91,7 @@ export function useTeaching() {
       else if (engagement === "medium") score = 60;
       else if (engagement === "high") score = 80;
       else if (engagement === "very_high") score = 95;
-      console.log("latest score ", score);
+      // console.log("latest score ", score);
 
       if (!result) {
         alert("No teaching content to save");

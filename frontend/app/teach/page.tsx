@@ -62,7 +62,7 @@ export default function TeachPage() {
 
   useEffect(() => {
     const prefill = localStorage.getItem("prefill_data");
-    console.log("prefill - ", prefill);
+    // console.log("prefill - ", prefill);
 
     if (prefill) {
       try {

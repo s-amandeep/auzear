@@ -67,7 +67,7 @@ export default function WorksheetGenerator({
       if (!res.ok) throw new Error("Failed to fetch PDF");
 
       const blob = await res.blob();
-      console.log(blob.type);
+      // console.log(blob.type);
 
       const url = window.URL.createObjectURL(blob);
 
