@@ -9,6 +9,7 @@ async function generateWorksheet(data) {
     understanding_score,
     count,
     style,
+    teach,
   } = data;
 
   if (!topic || !classLevel) {
@@ -22,6 +23,7 @@ async function generateWorksheet(data) {
     understanding_score,
     count,
     style,
+    teach,
   });
 
   const raw = await generateFromPrompt(prompt);
@@ -43,6 +45,16 @@ async function generateWorksheet(data) {
   ) {
     throw new Error("Invalid worksheet format");
   }
+
+  // ❗ Reject weak output
+  // const isTooGeneric = parsed.questions.some(
+  //   (q) =>
+  //     q.toLowerCase().includes("define") || q.toLowerCase().includes("what is"),
+  // );
+
+  // if (isTooGeneric && teaching_mode !== "basic") {
+  //   throw new Error("Generic worksheet detected");
+  // }
 
   return parsed;
 }

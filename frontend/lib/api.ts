@@ -166,8 +166,22 @@ export async function generateWorksheet(data: {
   understanding_score: number;
   count: number;
   style: "basic" | "mixed" | "thinking" | "creative";
+  teach: string;
 }) {
   return apiFetch("/api/worksheet", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+
+// Fetch next steps
+export async function fetchNextStep(data: {
+  topic: string;
+  classLevel: string;
+  understanding_score: number;
+}) {
+  return apiFetch("/api/progression", {
     method: "POST",
     body: JSON.stringify(data),
   });

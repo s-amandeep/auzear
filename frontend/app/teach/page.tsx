@@ -216,7 +216,7 @@ export default function TeachPage() {
       )}
 
       {/* Deep Dive */}
-      {teachingMode === "advanced" && deepDive && (
+      {teachingMode === "advanced" && deepDive && hasResult && (
         <div className="bg-blue-50 p-3 rounded-xl w-full max-w-lg mt-3">
           <p className="text-sm font-medium mb-1">Let’s think deeper:</p>
           <p className="text-sm text-gray-800">{deepDive}</p>
@@ -293,6 +293,7 @@ export default function TeachPage() {
         classLevel={currentClass}
         teachingMode={teachingMode}
         understandingScore={60}
+        teach={result}
       />
 
       {/* Footer */}

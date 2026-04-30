@@ -5,43 +5,58 @@ function getWorksheetPrompt({
   understanding_score,
   count,
   style,
+  teach,
 }) {
   return `
-You are an expert school teacher.
+You are an expert teacher.
 
-Create a worksheet for a Class ${classLevel} student.
+A child has just been taught the following:
+
+---
+${teach}
+---
 
 Topic: ${topic}
+Class: ${classLevel}
 Teaching level: ${teaching_mode}
 Understanding score: ${understanding_score}
 
+Your task is to create a worksheet that CONTINUES THIS EXACT TEACHING.
+
+---
+
+STRICT RULES:
+
+1. Questions MUST be based on the explanation above
+2. Do NOT generate generic textbook questions
+3. Maintain SAME CONTEXT, examples, and framing used in teaching
+4. Match class level STRICTLY (Class ${classLevel})
+5. If topic is specific (e.g. Translation in Maths), questions MUST reflect that exact concept
+6. Avoid rewording same question — ensure conceptual variety
+7. Difficulty must align with teaching level
+8. Each question MUST clearly reflect the concept: "${topic}"
+
+---
+
+STYLE GUIDELINES:
+
+- basic → direct recall from explanation
+- mixed → recall + application + thinking
+- thinking → reasoning, multi-step, scenario-based
+- creative → real-world, open-ended, explanation-based
+
+---
+
 Number of questions: ${count}
-
-Worksheet style: ${style}
-
----
-
-Style meaning:
-
-- basic → simple recall, fill blanks (Basic Practice)
-- mixed → mix of easy, moderate, thinking (Mixed Practice)
-- thinking → application, reasoning (Thinking & Application)
-- creative → real-life, imaginative (Fun & Creative)
+Style: ${style}
 
 ---
 
-Instructions:
+VALIDATION BEFORE RESPONSE:
 
-1. Generate EXACTLY ${count} questions
-2. Be very sure to match difficulty with teaching level
-3. Adjust questions based on worksheet style
-4. Keep language simple and age-appropriate
-5. Keep questions short and clear and no long explanations in questions
-6. Do NOT repeat questions
-
----
-
-Also generate answers.
+- If questions feel generic → regenerate internally
+- If questions don't match explanation → regenerate internally
+- If class level mismatch → regenerate internally
 
 ---
 

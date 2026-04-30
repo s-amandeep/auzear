@@ -9,6 +9,7 @@ type Props = {
   classLevel: string;
   teachingMode: "foundational" | "intermediate" | "advanced";
   understandingScore: number;
+  teach: string;
 };
 
 export default function WorksheetGenerator({
@@ -16,6 +17,7 @@ export default function WorksheetGenerator({
   classLevel,
   teachingMode,
   understandingScore,
+  teach,
 }: Props) {
   const [count, setCount] = useState(5);
   const [showAnswers, setShowAnswers] = useState(true);
@@ -36,6 +38,7 @@ export default function WorksheetGenerator({
       understanding_score: understandingScore,
       count,
       style,
+      teach,
     });
 
     if (!res?.error) {
@@ -83,13 +86,13 @@ export default function WorksheetGenerator({
   };
 
   const handlePrint = () => {
-  if (!worksheet) return;
+    if (!worksheet) return;
 
-  const printWindow = window.open("", "_blank");
+    const printWindow = window.open("", "_blank");
 
-  if (!printWindow) return;
+    if (!printWindow) return;
 
-  const html = `
+    const html = `
     <html>
       <head>
         <title>Worksheet</title>
@@ -150,17 +153,17 @@ export default function WorksheetGenerator({
     </html>
   `;
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
 
-  printWindow.focus();
+    printWindow.focus();
 
-  setTimeout(() => {
-    printWindow.print();
-    printWindow.close();
-  }, 300);
-};
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 300);
+  };
 
   return (
     <div className="w-full max-w-lg mt-6">
@@ -192,23 +195,43 @@ export default function WorksheetGenerator({
         {/* Style */}
         <div>
           <p className="text-sm font-medium mb-1">Practice Style</p>
-          <div className="flex flex-wrap gap-2">
+          {/* <div className="flex flex-wrap gap-2"> */}
+          <div className="flex gap-3">
             {[
-              { key: "basic", label: "Basic" },
-              { key: "mixed", label: "Mixed" },
-              { key: "thinking", label: "Thinking" },
-              { key: "creative", label: "Creative" },
+              {
+                key: "basic",
+                label: "Basic",
+                text: "direct recall from explanation",
+              },
+              {
+                key: "mixed",
+                label: "Mixed",
+                text: "recall + application + thinking",
+              },
+              {
+                key: "thinking",
+                label: "Thinking",
+                text: "reasoning, multi-step, scenario-based",
+              },
+              {
+                key: "creative",
+                label: "Creative",
+                text: "real-world, open-ended, explanation-based",
+              },
             ].map((item) => (
               <button
                 key={item.key}
                 onClick={() => setStyle(item.key as any)}
-                className={`px-3 py-1 rounded-lg text-sm border ${
+                className={`flex flex-col items-center px-3 py-2 rounded-lg border ${
+                  // className={`px-3 py-1 rounded-lg text-sm border ${
                   style === item.key
                     ? "bg-black text-white"
                     : "bg-white text-gray-700"
                 }`}
               >
-                {item.label}
+                {/* {item.label} */}
+                <span>{item.label}</span>
+                <span className="text-xs">{item.text}</span>
               </button>
             ))}
           </div>

@@ -3,6 +3,32 @@ const { generateFromPrompt } = require("./aiService");
 const { getTeachingPromptV2 } = require("../prompts/teachingPromptV2");
 const { getConceptMapPrompt } = require("../prompts/conceptMapPrompt");
 
+function normalizeTeach(teach) {
+  if (!teach) return "";
+
+  // ✅ Case 1: already string
+  if (typeof teach === "string") {
+    return teach;
+  }
+
+  // ✅ Case 2: structured object (advanced mode)
+  if (typeof teach === "object") {
+    return [
+      teach.why_it_works ? `Why it works:\n${teach.why_it_works}` : null,
+
+      teach.comparison ? `\nComparison:\n${teach.comparison}` : null,
+
+      teach.conceptual_insight
+        ? `\nConceptual Insight:\n${teach.conceptual_insight}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+  }
+
+  return "";
+}
+
 async function generateTeaching({ topic, classLevel, teaching_mode }) {
   if (!topic) return null;
 
@@ -46,7 +72,17 @@ async function generateTeaching({ topic, classLevel, teaching_mode }) {
 
   // 3. Safe parse
   const parsed = safeParseJSON(teachingRaw);
-  // console.log("Parsed teaching: ", parsed);
+  console.log(parsed);
+
+  if (!parsed.teach) {
+    throw new Error("Missing teach content");
+  }
+
+  // Preserve raw (future use)
+  parsed._raw_deep_dive = parsed.deep_dive;
+
+  // Normalize for UI
+  parsed.deep_dive = normalizeTeach(parsed.deep_dive);
 
   return parsed;
 }

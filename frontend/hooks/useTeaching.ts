@@ -169,6 +169,7 @@ export function useTeaching() {
     setPrerequisite(data.prerequisite || null);
     setNextStep(data.next_step || null);
     setDeepDive(data.deep_dive || null);
+    setTeachingMode(data.teaching_mode || "foundational");
     setCurrentClass(String(classLevel || 5));
   };
 

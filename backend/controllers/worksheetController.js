@@ -9,6 +9,7 @@ async function handleGenerateWorksheet(req, res) {
       understanding_score,
       count = 5,
       style = "mixed",
+      teach,
     } = req.body;
 
     console.log("Worksheet AI CALL:", {
@@ -29,6 +30,7 @@ async function handleGenerateWorksheet(req, res) {
       understanding_score,
       count,
       style,
+      teach,
     });
 
     res.json(worksheet);

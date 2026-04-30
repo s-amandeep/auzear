@@ -11,6 +11,7 @@ type Props = {
   classLevel: string;
   teachingMode: "foundational" | "intermediate" | "advanced";
   understandingScore: number;
+  teach: string;
 };
 
 export default function WorksheetModal({
@@ -20,6 +21,7 @@ export default function WorksheetModal({
   classLevel,
   teachingMode,
   understandingScore,
+  teach,
 }: Props) {
   if (!isOpen) {
     return null;
@@ -45,6 +47,7 @@ export default function WorksheetModal({
           classLevel={classLevel}
           teachingMode={teachingMode}
           understandingScore={understandingScore}
+          teach={teach}
         />
       </div>
     </div>

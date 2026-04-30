@@ -68,6 +68,8 @@ async function fetchTopicDetail(child_id, concept_id) {
 
     teaching_mode: lastSession?.teaching_mode || "foundational",
     understanding_score: lastSession?.understanding_score || 0,
+    // 🔥 IMPORTANT FIX
+    deep_dive: lastSession.deep_dive || null,
 
     next_step: lastSession?.next_step || null, // 🔥 future-ready
   };

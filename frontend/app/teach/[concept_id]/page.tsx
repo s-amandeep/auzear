@@ -231,6 +231,7 @@ export default function TeachRevisit() {
         classLevel={String(data.class_level)}
         teachingMode={data.teaching_mode}
         understandingScore={data.understanding_score}
+        teach={data.teach}
       />
     </main>
   );
